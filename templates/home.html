@@ -8,37 +8,91 @@
 
 <body class="home-page">
 
-<div class="header">
-    Mess Manager System
-</div>
+    <div class="header">
+        Mess Manager System
+    </div>
 
-<div class="container">
+    <div class="container">
 
-<div class="home-content">
+        <div class="home-content">
 
-<div class="home-image">
-<img src="{{ url_for('static', filename='mess.jpg') }}" alt="Mess Manager">
-</div>
+            <div class="dashboard-cards">
 
-<div class="home-menu">
+                <div class="dashboard-card">
+                    <h3>Total Students</h3>
+                    <p>{{ total_students }}</p>
+                </div>
 
-<a href="/add_student_page">
-<button class="home-btn">Add Student</button>
-</a>
+                <div class="dashboard-card">
+                    <h3>Total Collected</h3>
+                    <p>₹{{ total_collected }}</p>
+                </div>
 
-<a href="/student_list">
-<button class="home-btn">Student List</button>
-</a>
+                <div class="dashboard-card">
+                    <h3>Total Pending</h3>
+                    <p>₹{{ total_pending }}</p>
+                </div>
 
-<a href="/payment_page">
-<button class="home-btn">Take Payment</button>
-</a>
+                <div class="dashboard-card">
+                    <h3>Pending Students</h3>
+                    <p>{{ pending_students }}</p>
+                </div>
 
-</div>
+            </div>
 
-</div>
+            <div class="recent-payments">
 
-</div>
+                <h2>Recent Payments</h2>
+
+                {% if recent_payments %}
+
+                {% for payment in recent_payments %}
+
+                <div class="payment-item">
+
+                    <b>{{ payment[0] }}</b>
+
+                    paid
+
+                    <b>₹{{ payment[1] }}</b>
+
+                    on
+
+                    {{ payment[2] }}
+
+                </div>
+
+                {% endfor %}
+
+                {% else %}
+
+                <p>No recent payments</p>
+
+                {% endif %}
+
+            </div>
+
+            <div class="home-menu">
+
+                <a href="/add_student_page">
+                    <button class="home-btn">Add Student</button>
+                </a>
+
+                <a href="/student_list">
+                    <button class="home-btn">Student List</button>
+                </a>
+
+                <a href="/pending_payments">
+                    <button class="home-btn">Pending Payments</button>
+                </a>
+
+
+            </div>
+
+        </div>
+
+    </div>
 
 </body>
+
 </html>

@@ -17,32 +17,96 @@
 
 <form action="/update_student" method="POST">
 
-<input type="hidden" name="id" value="{{ student[0] }}">
+<input type="hidden"
+name="student_id"
+value="{{ student[0] }}">
 
 Name:
-<input type="text" name="name" value="{{ student[1] }}" required>
+<input type="text"
+name="name"
+value="{{ student[1] }}"
+required>
 
 <br><br>
 
-Room:
-<input type="text" name="room" value="{{ student[2] }}" required>
+Mobile:
+<input type="text"
+name="mobile"
+value="{{ student[8] }}"
+required>
 
 <br><br>
 
-Hostel:
-<select name="hostel">
+Department:
 
-<option value="Shivneri" {% if student[3]=='Shivneri' %}selected{% endif %}>Shivneri</option>
+<select name="department" required>
 
-<option value="Raygad" {% if student[3]=='Raygad' %}selected{% endif %}>Raygad</option>
+<option value="Engineering"
+{% if student[7] == 'Engineering' %}selected{% endif %}>
+Engineering
+</option>
 
-<option value="Rajgad" {% if student[3]=='Rajgad' %}selected{% endif %}>Rajgad</option>
+<option value="Diploma"
+{% if student[7] == 'Diploma' %}selected{% endif %}>
+Diploma
+</option>
+
+<option value="Pharmacy"
+{% if student[7] == 'Pharmacy' %}selected{% endif %}>
+Pharmacy
+</option>
+
+<option value="School"
+{% if student[7] == 'School' %}selected{% endif %}>
+School
+</option>
 
 </select>
 
 <br><br>
 
-<button type="submit">Update Student</button>
+Academic Level:
+<input type="text"
+name="academic_level"
+value="{{ student[9] }}"
+required>
+
+<br><br>
+
+Room:
+<input type="text"
+name="room"
+value="{{ student[2] }}"
+required>
+
+<br><br>
+
+Hostel:
+
+<select name="hostel">
+
+<option value="Shivneri"
+{% if student[3] == 'Shivneri' %}selected{% endif %}>
+Shivneri
+</option>
+
+<option value="Raygad"
+{% if student[3] == 'Raygad' %}selected{% endif %}>
+Raygad
+</option>
+
+<option value="Rajgad"
+{% if student[3] == 'Rajgad' %}selected{% endif %}>
+Rajgad
+</option>
+
+</select>
+
+<br><br>
+
+<button type="submit">
+Update Student
+</button>
 
 </form>
 

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Receive Payment</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="header">
+    Mess Manager System
+</div>
+
+<div class="container">
+
+<h2>Receive Payment</h2>
+
+<div class="payment-card">
+
+<h3>{{ student[1] }}</h3>
+
+<p><b>Remaining Amount:</b> ₹{{ student[5] }}</p>
+
+<form action="/receive_payment" method="POST">
+
+<input type="hidden"
+name="student_id"
+value="{{ student[0] }}">
+
+Enter Amount:
+
+<input type="number"
+name="amount"
+max="{{ student[5] }}"
+required>
+
+<br><br>
+
+<button type="submit">
+Receive Payment
+</button>
+
+</form>
+
+</div>
+
+<br>
+
+<a href="/student_profile/{{ student[0] }}">
+    <button>Back to Profile</button>
+</a>
+
+<a href="/" class="home-floating-btn">
+    Home
+</a>
+
+</div>
+
+</body>
+</html>
