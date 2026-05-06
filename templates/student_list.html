@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Student List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="header">
+        <h1>Mess Manager System</h1>
+    </div>
+
+    <div class="container">
+
+        <h2>Student List</h2>
+
+        <div class="toolbar">
+
+            <div class="filter-buttons">
+                <a href="/student_list"><button>All Students</button></a>
+                <a href="/student_list?hostel=Shivneri"><button>Shivneri</button></a>
+                <a href="/student_list?hostel=Raygad"><button>Raygad</button></a>
+                <a href="/student_list?hostel=Rajgad"><button>Rajgad</button></a>
+            </div>
+
+            <div class="export-button">
+                <a href="/export_csv">
+                    <button>Export Student Data (CSV)</button>
+                </a>
+            </div>
+
+        </div>
+
+        <br><br>
+
+
+        <input type="text" id="searchInput" onkeyup="searchStudent()" placeholder="Search by student name...">
+
+        <br><br>
+
+        <table border="1">
+
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Room</th>
+                <th>Hostel</th>
+                <th>Received</th>
+                <th>Remaining</th>
+                <th>History</th>
+                <th>Delete</th>
+                <th>Edit</th>
+            </tr>
+
+            {% for student in students %}
+
+            <tr>
+                <td>{{ student[0] }}</td>
+                <td>{{ student[1] }}</td>
+                <td>{{ student[2] }}</td>
+                <td>{{ student[3] }}</td>
+                <td>{{ student[4] }}</td>
+                <td>{{ student[5] }}</td>
+                <td>
+                    <a href="/payment_history/{{ student[0] }}">
+                        <button>View</button>
+                    </a>
+                </td>
+                <td>
+                    <a href="/delete_student/{{ student[0] }}"
+                        onclick="return confirm('Are you sure you want to delete this student?')">
+                        <button>Delete</button>
+                    </a>
+                </td>
+                <td>
+                    <a href="/edit_student/{{ student[0] }}">
+                        <button>Edit</button>
+                    </a>
+                </td>
+            </tr>
+
+
+
+            {% endfor %}
+
+        </table>
+
+        <br><br>
+
+
+        <br><br>
+
+        <a href="/">
+            <button>Back to Home</button>
+        </a>
+
+
+
+        <script>
+
+            function searchStudent() {
+
+                let input = document.getElementById("searchInput").value.toLowerCase();
+                let table = document.querySelector("table");
+                let rows = table.getElementsByTagName("tr");
+
+                for (let i = 1; i < rows.length; i++) {
+
+                    let nameColumn = rows[i].getElementsByTagName("td")[1];
+
+                    if (nameColumn) {
+
+                        let name = nameColumn.textContent.toLowerCase();
+
+                        if (name.includes(input)) {
+                            rows[i].style.display = "";
+                        } else {
+                            rows[i].style.display = "none";
+                        }
+
+                    }
+
+                }
+
+            }
+
+        </script>
+    </div>
+</body>
+
+</html>

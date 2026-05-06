@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Edit Student</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="header">
+    <h1>Mess Manager System</h1>
+</div>
+
+<div class="container">
+
+<h2>Edit Student</h2>
+
+<form action="/update_student" method="POST">
+
+<input type="hidden" name="id" value="{{ student[0] }}">
+
+Name:
+<input type="text" name="name" value="{{ student[1] }}" required>
+
+<br><br>
+
+Room:
+<input type="text" name="room" value="{{ student[2] }}" required>
+
+<br><br>
+
+Hostel:
+<select name="hostel">
+
+<option value="Shivneri" {% if student[3]=='Shivneri' %}selected{% endif %}>Shivneri</option>
+
+<option value="Raygad" {% if student[3]=='Raygad' %}selected{% endif %}>Raygad</option>
+
+<option value="Rajgad" {% if student[3]=='Rajgad' %}selected{% endif %}>Rajgad</option>
+
+</select>
+
+<br><br>
+
+<button type="submit">Update Student</button>
+
+</form>
+
+<br>
+
+<a href="/student_list">
+<button>Back</button>
+</a>
+</div>
+</body>
+</html>

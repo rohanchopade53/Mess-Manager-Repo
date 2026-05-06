@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Payment History</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="header">
+    <h1>Mess Manager System</h1>
+</div>
+
+<div class="container">
+
+<h2>Payment History</h2>
+
+<table border="1">
+
+<tr>
+<th>Amount Paid</th>
+<th>Date</th>
+</tr>
+
+{% for payment in history %}
+
+<tr>
+<td>{{ payment[0] }}</td>
+<td>{{ payment[1] }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br><br>
+
+<a href="/student_list">
+<button>Back</button>
+</a>
+</div>
+</body>
+</html>

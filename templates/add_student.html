@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add Student</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="header">
+    <h1>Mess Manager System</h1>
+</div>
+
+<div class="container">
+
+    
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li style="color: green;">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+<h2>Add Student</h2>
+
+<form action="/add_student" method="POST">
+
+Name:
+<input type="text" name="name" required>
+
+<br><br>
+
+Room:
+<input type="text" name="room" required>
+
+<br><br>
+
+Hostel:
+<select name="hostel">
+
+<option value="Shivneri">Shivneri</option>
+<option value="Raygad">Raygad</option>
+<option value="Rajgad">Rajgad</option>
+
+</select>
+
+<br><br>
+
+<button type="submit">Add Student</button>
+
+</form>
+
+<br><br>
+
+<a href="/">Back to Home</a>
+</div>
+
+</body>
+</html>

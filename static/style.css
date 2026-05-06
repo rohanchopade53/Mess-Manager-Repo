@@ -1,0 +1,289 @@
+/* Page background */
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #eef2f7;
+    margin: 0;
+}
+
+
+/* Header bar */
+.header {
+    width: 100%;
+    background-color: #1e3a5f;
+    color: white;
+    text-align: center;
+    padding: 18px 0;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+
+/* Page container */
+.container {
+    width: 90%;
+    max-width: 900px;
+    margin: 30px auto;
+}
+
+
+/* Dashboard menu buttons */
+.home-btn {
+    width: 220px;
+    padding: 16px;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    border-radius: 10px;
+
+    background-color: #2c5282;
+    color: white;
+
+    transition: transform 0.2s ease;
+}
+
+.home-btn:hover {
+    background-color: #3b6ea8;
+    transform: translateY(-4px);
+}
+
+
+.home-btn {
+    width: 220px;
+    padding: 16px;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    border-radius: 10px;
+
+    background-color: #2c5282;
+    color: white;
+
+    transition: transform 0.2s ease;
+}
+
+.home-btn:hover {
+    background-color: #3b6ea8;
+    transform: translateY(-4px);
+}
+
+
+/* Default buttons */
+button {
+    background-color: #2c5282;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+
+button:hover {
+    background-color: #3b6ea8;
+}
+
+
+/* Export button */
+.export-button button {
+    background-color: #2f855a;
+}
+
+
+.export-button button:hover {
+    background-color: #38a169;
+}
+
+
+/* Delete button */
+.delete-btn {
+    background-color: #c53030;
+}
+
+
+.delete-btn:hover {
+    background-color: #e53e3e;
+}
+
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+
+th {
+    background-color: #1e3a5f;
+    color: white;
+    padding: 12px;
+}
+
+
+td {
+    padding: 10px;
+    text-align: center;
+}
+
+
+tr:nth-child(even) {
+    background-color: #f7fafc;
+}
+
+
+/* Forms */
+form {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    box-shadow: 0px 3px 10px rgba(0,0,0,0.1);
+}
+
+
+/* Inputs */
+input, select {
+    width: 95%;
+    padding: 8px;
+    margin: 8px 0;
+}
+
+
+/* Alerts */
+.alert {
+    background-color: #e6fffa;
+    border-left: 6px solid #38b2ac;
+    padding: 12px;
+    margin-bottom: 15px;
+}
+
+
+/* Toolbar (student list buttons row) */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+
+/* Payment page search box */
+.search-box {
+    width: 300px;
+    max-width: 90%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    display: block;
+    margin: 10px auto 20px auto;
+}
+
+.payment-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 450px;
+    margin: auto;
+    box-shadow: 0px 4px 14px rgba(0,0,0,0.08);
+}
+
+.search-results {
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+}
+
+.search-results div {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.search-results div:hover {
+    background-color: #eef2f7;
+}
+
+.selected-student {
+    font-weight: 600;
+    margin: 12px 0;
+}
+
+
+/* HOME PAGE DASHBOARD CENTERING */
+
+.home-page {
+    height: 100vh;
+}
+
+/* center content vertically */
+.home-page .container {
+    height: calc(100vh - 80px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* stack image above buttons */
+.home-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* image styling */
+.home-image {
+    margin-bottom: 50px;
+}
+
+.home-image img {
+    width: 320px;
+    max-width: 90%;
+}
+
+/* horizontal buttons */
+.home-menu {
+    display: flex;
+    gap: 40px;
+}
+
+/* dashboard button styling */
+.home-btn {
+    width: 220px;
+    padding: 18px;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    border-radius: 12px;
+
+    background-color: #2c5282;
+    color: white;
+
+    border: none;
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.home-btn:hover {
+    background-color: #3b6ea8;
+    transform: translateY(-5px);
+}
+img{
+
+    border-radius: 5px;
+}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Mess Manager System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="home-page">
+
+<div class="header">
+    Mess Manager System
+</div>
+
+<div class="container">
+
+<div class="home-content">
+
+<div class="home-image">
+<img src="{{ url_for('static', filename='mess.jpg*') }}" alt="Mess Manager">
+</div>
+
+<div class="home-menu">
+
+<a href="/add_student_page">
+<button class="home-btn">Add Student</button>
+</a>
+
+<a href="/student_list">
+<button class="home-btn">Student List</button>
+</a>
+
+<a href="/payment_page">
+<button class="home-btn">Take Payment</button>
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Mess Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="header">
+    <h1>Mess Manager System</h1>
+</div>
+
+<div class="container">
+
+    <h2>Add Student</h2>
+
+<form action="/add_student" method="POST">
+
+Name:
+<input type="text" name="name" required>
+
+Room:
+<input type="text" name="room" required>
+
+Hostel:
+<select name="hostel" required>
+    <option value="Shivneri">Shivneri</option>
+    <option value="Raygad">Raygad</option>
+    <option value="Rajgad">Rajgad</option>
+</select>
+
+<button type="submit">Add Student</button>
+
+</form>
+
+
+<form action="/" method="GET">
+    <input type="hidden" name="show" value="1">
+    <button type="submit">Show Student List</button>
+</form>
+
+
+{% if show == '1' %}
+
+<h2>Student List</h2>
+
+<table border="1">
+
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Room</th>
+<th>Hostel</th>
+<th>Received Amount</th>
+<th>Remaining Amount</th>
+</tr>
+
+{% for student in students %}
+
+<tr>
+<td>{{ student[0] }}</td>
+<td>{{ student[1] }}</td>
+<td>{{ student[2] }}</td>
+<td>{{ student[3] }}</td>
+<td>{{ student[4] }}</td>
+<td>{{ student[5] }}</td>
+<td>
+<form action="/receive_payment" method="POST">
+<input type="hidden" name="student_id" value="{{ student[0] }}">
+<input type="number" name="amount" placeholder="Enter amount" required>
+<button type="submit">Receive</button>
+</form>
+</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endif %}
+</div>
+</body>
+
+</html>
