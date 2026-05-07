@@ -9,27 +9,79 @@
 
 <body>
 
-    <div class="header">
-        Mess Manager System
+    <div class="topbar">
+
+        <div class="logo">
+            Mess Manager
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">Dashboard</a>
+
+            <a href="/add_student">Add Student</a>
+
+            <a href="/student_list">Students</a>
+
+            <a href="/pending_payments">Pending</a>
+
+        </div>
+
     </div>
 
-    <div class="navbar">
 
-    <a href="/">Dashboard</a>
-
-    <a href="/add_student">Add Student</a>
-
-    <a href="/student_list">Students</a>
-
-    <a href="/pending_payments">Pending Payments</a>
-
-</div>
 
     <div class="container">
-        
-        <h2 class="student-name">
-    {{ student[1] }}
-</h2>
+
+        <div class="profile-header">
+            <div class="profile-summary">
+
+    <div class="summary-card">
+
+        <h3>Total Fee</h3>
+
+        <p>₹30000</p>
+
+    </div>
+
+    <div class="summary-card">
+
+        <h3>Paid</h3>
+
+        <p>₹{{ student[4] }}</p>
+
+    </div>
+
+    <div class="summary-card">
+
+        <h3>Remaining</h3>
+
+        <p>₹{{ student[5] }}</p>
+
+    </div>
+
+</div>
+            <div class="profile-avatar">
+
+                {{ student[1][0] }}
+
+            </div>
+
+            <div class="profile-info">
+
+                <h1 class="profile-name">
+                    {{ student[1] }}
+                </h1>
+
+                <p class="profile-subtitle">
+
+                    {{ student[3] }} Hostel • Room {{ student[2] }}
+
+                </p>
+
+            </div>
+
+        </div>
 
         <div class="profile-buttons">
 
@@ -64,7 +116,7 @@
 
         <div class="payment-card">
 
-            
+
 
             <p><b>Department:</b> {{ student[7] }}</p>
 
@@ -120,7 +172,7 @@
 
         <br>
 
-    
+
     </div>
 
 </body>

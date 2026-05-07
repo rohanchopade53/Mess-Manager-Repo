@@ -7,30 +7,50 @@
 </head>
 
 <body>
-    <div class="header">
-        <h1>Mess Manager System</h1>
+    <div class="topbar">
+
+        <div class="logo">
+            Mess Manager
+        </div>
+
+        <div class="nav-links">
+
+            <a href="/">Dashboard</a>
+
+            <a href="/add_student">Add Student</a>
+
+            <a href="/student_list">Students</a>
+
+            <a href="/pending_payments">Pending</a>
+
+        </div>
+
     </div>
 
-    <div class="navbar">
 
-    <a href="/">Dashboard</a>
-
-    <a href="/add_student">Add Student</a>
-
-    <a href="/student_list">Students</a>
-
-    <a href="/pending_payments">Pending Payments</a>
-
-</div>
 
     <div class="container">
 
-        <h2>Student List</h2>
+        <div class="page-header">
+
+            <div>
+
+                <h1 class="page-title">
+                    Students Directory
+                </h1>
+
+                <p class="page-subtitle">
+                    Manage and search all registered students
+                </p>
+
+            </div>
+
+        </div>
 
         <div class="toolbar">
 
             <div class="filter-buttons">
-                <a href="/student_list"><button>All Students</button></a>
+                <a href="/student_list"><BUTTON>All Students</button></a>
                 <a href="/student_list?hostel=Shivneri"><button>Shivneri</button></a>
                 <a href="/student_list?hostel=Raygad"><button>Raygad</button></a>
                 <a href="/student_list?hostel=Rajgad"><button>Rajgad</button></a>
@@ -47,9 +67,20 @@
         <br><br>
 
 
-        <input type="text" id="searchInput" onkeyup="searchStudent()" placeholder="Search by student name..."
-            class="search-box">
+        <div class="search-panel">
 
+            <form method="GET" class="search-form">
+
+                <input type="text" name="search" placeholder="Search by name, room or mobile"
+                    value="{{ request.args.get('search', '') }}">
+
+                <button type="submit">
+                    Search
+                </button>
+
+            </form>
+
+        </div>
         <br><br>
 
 
@@ -70,17 +101,26 @@
 
         {% endwith %}
 
+     <div class="table-panel">
 
-        <table border="1" id="studentTable">
+    <table id="studentTable" class="students-table">
+
+        <thead>
 
             <tr>
+
                 <th>Name</th>
                 <th>Hostel</th>
                 <th>Room</th>
                 <th>Remaining</th>
                 <th>Status</th>
                 <th>Profile</th>
+
             </tr>
+
+        </thead>
+
+        <tbody>
 
             {% for student in students %}
 
@@ -119,28 +159,30 @@
                 </td>
 
                 <td>
-                    <a href="/student_profile/{{ student[0] }}">
-                        <button>View Profile</button>
+
+                   <a href="/student_profile/{{ student[0] }}"
+                       class="table-action-btn">
+
+                        View Profile
+
                     </a>
+
                 </td>
 
             </tr>
 
-
-
             {% endfor %}
 
-        </table>
+        </tbody>
+
+    </table>
+
+</div>
 
         <br><br>
 
 
-        <br><br>
-
-        <a href="/" class="home-floating-btn">
-            Home
-        </a>
-
+       
 
 
     </div>

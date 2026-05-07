@@ -156,25 +156,115 @@ def add_student_page():
 @app.route('/student_list')
 def student_list():
 
+    search = request.args.get('search')
+
     hostel = request.args.get('hostel')
 
     conn = connect_db()
 
-    if hostel:
+
+    # BOTH hostel + search
+
+    if hostel and search:
+
         students = conn.execute(
+
+            """
+
+            SELECT * FROM students
+
+            WHERE hostel = ?
+
+            AND (
+
+                name LIKE ?
+
+                OR room LIKE ?
+
+                OR mobile LIKE ?
+
+            )
+
+            """,
+
+            (
+
+                hostel,
+
+                f"%{search}%",
+
+                f"%{search}%",
+
+                f"%{search}%"
+
+            )
+
+        ).fetchall()
+
+
+    # ONLY hostel filter
+
+    elif hostel:
+
+        students = conn.execute(
+
             "SELECT * FROM students WHERE hostel = ?",
+
             (hostel,)
+
         ).fetchall()
-    else:
+
+
+    # ONLY search
+
+    elif search:
+
         students = conn.execute(
-            "SELECT * FROM students"
+
+            """
+
+            SELECT * FROM students
+
+            WHERE
+
+                name LIKE ?
+
+                OR room LIKE ?
+
+                OR mobile LIKE ?
+
+            """,
+
+            (
+                f"{search}%",
+                f"{search}%",
+                f"{search}%"
+
+            )
+
         ).fetchall()
+
+
+    # NO filters
+
+    else:
+
+        students = conn.execute(
+
+            "SELECT * FROM students"
+
+        ).fetchall()
+
 
     conn.close()
 
-    return render_template("student_list.html", students=students)
+    return render_template(
 
+        "student_list.html",
 
+        students=students
+
+    )
 
 
 @app.route('/payment_page')
@@ -368,7 +458,7 @@ def update_student():
     return redirect('/student_list')
 
 
-@app.route('/student_profile/<int:student_id>')
+@app.route("/student_profile/<int:student_id>")
 def student_profile(student_id):
 
     conn = connect_db()

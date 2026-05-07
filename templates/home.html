@@ -8,87 +8,140 @@
 
 <body class="home-page">
 
-    <div class="header">
-        Mess Manager System
-    </div>
+    <div class="topbar">
 
-    <div class="navbar">
+        <div class="logo">
+            Mess Manager
+        </div>
 
-    <a href="/">Dashboard</a>
+        <div class="nav-links">
 
-    <a href="/add_student">Add Student</a>
+            <a href="/">Dashboard</a>
 
-    <a href="/student_list">Students</a>
+            <a href="/add_student">Add Student</a>
 
-    <a href="/pending_payments">Pending Payments</a>
+            <a href="/student_list">Students</a>
 
-</div>
-
-    <div class="container">
-
-        <div class="home-content">
-
-            <div class="dashboard-cards">
-
-                <div class="dashboard-card">
-                    <h3>Total Students</h3>
-                    <p>{{ total_students }}</p>
-                </div>
-
-                <div class="dashboard-card">
-                    <h3>Total Collected</h3>
-                    <p>₹{{ total_collected }}</p>
-                </div>
-
-                <div class="dashboard-card">
-                    <h3>Total Pending</h3>
-                    <p>₹{{ total_pending }}</p>
-                </div>
-
-                <div class="dashboard-card">
-                    <h3>Pending Students</h3>
-                    <p>{{ pending_students }}</p>
-                </div>
-
-            </div>
-
-            <div class="recent-payments">
-
-                <h2>Recent Payments</h2>
-
-                {% if recent_payments %}
-
-                {% for payment in recent_payments %}
-
-                <div class="payment-item">
-
-                    <b>{{ payment[0] }}</b>
-
-                    paid
-
-                    <b>₹{{ payment[1] }}</b>
-
-                    on
-
-                    {{ payment[2] }}
-
-                </div>
-
-                {% endfor %}
-
-                {% else %}
-
-                <p>No recent payments</p>
-
-                {% endif %}
-
-            </div>
-
-         
+            <a href="/pending_payments">Pending</a>
 
         </div>
 
     </div>
+
+
+<div class="dashboard-container">
+
+    <div class="dashboard-layout">
+
+        <!-- Stats Cards -->
+
+
+        <h1 class="dashboard-title">
+            Dashboard Overview
+        </h1>
+
+        <div class="dashboard-cards">
+
+        <div class="dashboard-card">
+            <h3>Total Students</h3>
+            <p>{{ total_students }}</p>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Total Collected</h3>
+            <p>₹{{ total_collected }}</p>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Total Pending</h3>
+            <p>₹{{ total_pending }}</p>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Pending Students</h3>
+            <p>{{ pending_students }}</p>
+        </div>
+
+    </div>
+    </div>
+    </div>
+
+
+    <!-- Middle Section -->
+
+    <div class="dashboard-middle">
+
+
+        <!-- Recent Payments -->
+
+        <div class="recent-payments">
+
+            <h2>Recent Activity</h2>
+
+            {% if recent_payments %}
+
+            {% for payment in recent_payments %}
+
+            <div class="payment-item">
+
+                <div class="payment-left">
+
+                    <div class="student-payment-name">
+                        {{ payment[0] }}
+                    </div>
+
+                    <div class="payment-date">
+                        {{ payment[2] }}
+                    </div>
+
+                </div>
+
+                <div class="payment-amount">
+                    ₹{{ payment[1] }}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+            {% else %}
+
+            <p>No recent payments</p>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- Quick Actions -->
+
+        <div class="quick-actions">
+
+            <h2>Operations</h2>
+
+            <div class="action-list">
+
+                <a href="/add_student" class="action-card">
+                    Add Student
+                </a>
+
+                <a href="/student_list" class="action-card">
+                    Students List
+                </a>
+
+                <a href="/pending_payments" class="action-card">
+                    Pending Payments
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    </div>
+
+    
 
 </body>
 
