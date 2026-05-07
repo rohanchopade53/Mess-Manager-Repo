@@ -229,15 +229,10 @@ input, select {
     margin-top: 20px;
 }
 
-/* center content vertically */
 .home-page .container {
-    height: calc(100vh - 80px);
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    margin-top: 30px;
 }
-
 
 
 /* horizontal buttons */
@@ -456,38 +451,42 @@ input, select {
     background-color: #4a5568;
 }
 
-/* Floating Home Button */
 
-.home-floating-btn {
+/* =========================
+   Global Navigation Bar
+========================= */
 
-    position: fixed;
+.navbar {
 
-    bottom: 20px;
+    background-color: #23406b;
 
-    left: 20px;
+    display: flex;
 
-    z-index: 1000;
+    justify-content: center;
 
-    background-color: #1e3a5f;
+    gap: 35px;
+
+    padding: 14px;
+
+    box-shadow: 0px 3px 8px rgba(0,0,0,0.08);
+}
+
+.navbar a {
 
     color: white;
 
     text-decoration: none;
 
-    padding: 14px 22px;
+    font-size: 17px;
 
-    border-radius: 12px;
-
-    font-weight: bold;
-
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
+    font-weight: 600;
 
     transition: 0.2s ease;
 }
 
-.home-floating-btn:hover {
+.navbar a:hover {
 
-    background-color: #2c5282;
+    color: #cbd5e0;
 
-    transform: translateY(-3px);
+    transform: translateY(-2px);
 }

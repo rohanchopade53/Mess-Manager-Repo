@@ -192,45 +192,35 @@ def payment_page():
 
 
 
-
-@app.route('/add_student', methods=['POST'])
+@app.route('/add_student', methods=['GET', 'POST'])
 def add_student():
 
-    name = request.form['name']
-    room = request.form['room']
-    hostel = request.form['hostel']
-    mobile = request.form['mobile']
-    department = request.form['department']
-    academic_level = request.form['academic_level']
-    joining_date = datetime.now().strftime("%d-%m-%Y")
+    if request.method == 'POST':
 
-    conn = connect_db()
+        name = request.form['name']
+        room = request.form['room']
+        hostel = request.form['hostel']
 
-    conn.execute(
-        """
-        INSERT INTO students
-        (name, room, hostel, joining_date,
-        mobile, department, academic_level)
+        conn = connect_db()
 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        """,
-
-        (
-            name,
-            room,
-            hostel,
-            joining_date,
-            mobile,
-            department,
-            academic_level
+        conn.execute(
+            """
+            INSERT INTO students
+            (name, room, hostel)
+            VALUES (?, ?, ?)
+            """,
+            (name, room, hostel)
         )
-    )
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+        conn.close()
 
-    flash("Student added successfully!")
-    return redirect('/add_student_page')
+        flash("Student added successfully!")
+
+        return redirect('/student_list')
+
+    return render_template('add_student.html')
+
 
 @app.route('/delete_student/<int:student_id>')
 def delete_student(student_id):
