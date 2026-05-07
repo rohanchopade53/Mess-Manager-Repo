@@ -380,36 +380,52 @@ input, select {
 }
 
 
-/* Fixed profile toolbar */
+/* Student profile name */
+
+.student-name {
+
+    text-align: center;
+
+    font-size: 34px;
+
+    color: #23406b;
+
+    margin-bottom: 30px;
+}
+
+/* =========================
+   Right Side Profile Actions
+========================= */
 
 .profile-buttons {
 
     position: fixed;
 
-    top: 80px;
+    bottom: 25px;
 
-    left: 50%;
-
-    transform: translateX(-50%);
+    right: 25px;
 
     z-index: 1000;
 
     display: flex;
 
-    gap: 15px;
+    flex-direction: column;
 
-    background: white;
-
-    padding: 14px 20px;
-
-    border-radius: 14px;
-
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.12);
+    gap: 14px;
 }
-
 .profile-buttons button {
 
-    min-width: 150px;
+    width: 180px;
+
+    padding: 14px;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    border-radius: 10px;
+
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.12);
 }
 
 /* =========================
@@ -489,4 +505,103 @@ input, select {
     color: #cbd5e0;
 
     transform: translateY(-2px);
+}
+
+/* =========================
+   Add Student Form
+========================= */
+
+.student-form-card {
+
+    background: white;
+
+    max-width: 550px;
+
+    margin: 40px auto;
+
+    padding: 40px;
+
+    border-radius: 18px;
+
+    box-shadow: 0px 6px 18px rgba(0,0,0,0.08);
+}
+
+.student-form-card h2 {
+
+    text-align: center;
+
+    margin-bottom: 30px;
+
+    color: #23406b;
+
+    font-size: 32px;
+}
+
+.student-form-card form {
+
+    box-shadow: none;
+
+    padding: 0;
+
+    max-width: 100%;
+
+    background: transparent;
+}
+
+.student-form-card label {
+
+    display: block;
+
+    margin-top: 16px;
+    margin-bottom: 8px;
+
+    font-weight: 600;
+
+    color: #2d3748;
+}
+
+.student-form-card input,
+.student-form-card select {
+
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid #cbd5e0;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    box-sizing: border-box;
+}
+
+.student-form-card input:focus,
+.student-form-card select:focus {
+
+    outline: none;
+
+    border-color: #2c5282;
+
+    box-shadow: 0px 0px 4px rgba(44,82,130,0.3);
+}
+
+.submit-btn {
+
+    width: 100%;
+
+    padding: 14px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    border-radius: 10px;
+
+    background-color: #2f855a;
+}
+
+.submit-btn:hover {
+
+    background-color: #38a169;
 }

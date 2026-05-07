@@ -35,52 +35,48 @@
     </ul>
   {% endif %}
 {% endwith %}
-<h2>Add Student</h2>
 
-<form action="/add_student" method="POST">
+<div class="student-form-card">
 
-Name:
-<input type="text" name="name" required>
+    <h2>Add New Student</h2>
 
-<br><br>
+    <form method="POST">
 
-Room:
-<input type="text" name="room" required>
+        <label>Student Name</label>
+        <input type="text" name="name" required>
 
-<br><br>
+        <label>Room Number</label>
+        <input type="text" name="room" required>
 
-Hostel:
-<select name="hostel">
+        <label>Hostel</label>
+        <select name="hostel" required>
 
-<option value="Shivneri">Shivneri</option>
-<option value="Raygad">Raygad</option>
-<option value="Rajgad">Rajgad</option>
+            <option value="">Select Hostel</option>
 
-</select>
+            <option>Shivneri</option>
+            <option>Rajgad</option>
+            <option>Raygad</option>
 
-<br><br>
-Mobile Number:
-<input type="text" name="mobile" required>
+        </select>
 
-<br><br>
-Department:
-<select name="department" required>
-    <option value="Engineering">Engineering</option>
-    <option value="Diploma">Diploma</option>
-    <option value="Pharmacy">Pharmacy</option>
-    <option value="School">School</option>
-</select>
+        <label>Department</label>
+        <input type="text" name="department">
 
-<br><br>
-Academic Level:
-<input type="text" name="academic_level"
-placeholder="Example: 1st Year / 10th Standard" required>
+        <label>Mobile Number</label>
+        <input type="text" name="mobile">
 
-<br><br>
+        <label>Year / Standard</label>
+        <input type="text" name="year">
 
-<button type="submit">Add Student</button>
+        <br><br>
 
-</form>
+        <button type="submit" class="submit-btn">
+            Add Student
+        </button>
+
+    </form>
+
+</div>
 
 <br><br>
 
