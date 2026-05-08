@@ -2,51 +2,51 @@
 <html>
 
 <head>
-    <title>Add Student</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <title>Add Student</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
   <div class="topbar">
 
     <div class="logo">
-        Mess Manager
+      Mess Manager
     </div>
 
     <div class="nav-links">
 
-        <a href="/">Dashboard</a>
+      <a href="/">Dashboard</a>
 
-        <a href="/add_student">Add Student</a>
+      <a href="/add_student">Add Student</a>
 
-        <a href="/student_list">Students</a>
+      <a href="/student_list">Students</a>
 
-        <a href="/pending_payments">Pending</a>
+      <a href="/pending_payments">Pending</a>
 
     </div>
 
-</div>
+  </div>
 
 
 
-<div class="container">
+  <div class="container">
 
-    
-{% with messages = get_flashed_messages() %}
-  {% if messages %}
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
     <ul>
       {% for message in messages %}
-        <li style="color: green;">{{ message }}</li>
+      <li style="color: green;">{{ message }}</li>
       {% endfor %}
     </ul>
-  {% endif %}
-{% endwith %}
+    {% endif %}
+    {% endwith %}
 
-<div class="student-form-card">
+    <div class="student-form-card">
 
-    <h2>Add New Student</h2>
+      <h2>Add New Student</h2>
 
-    <form method="POST">
+      <form method="POST">
 
         <label>Student Name</label>
         <input type="text" name="name" required>
@@ -57,16 +57,37 @@
         <label>Hostel</label>
         <select name="hostel" required>
 
-            <option value="">Select Hostel</option>
+          <option value="">Select Hostel</option>
 
-            <option>Shivneri</option>
-            <option>Rajgad</option>
-            <option>Raygad</option>
+          <option>Shivneri</option>
+          <option>Rajgad</option>
+          <option>Raygad</option>
 
         </select>
 
         <label>Department</label>
-        <input type="text" name="department">
+
+        <select name="department" required>
+
+          <option value="">Select Department</option>
+
+          <option value="Engineering">
+            Engineering
+          </option>
+
+          <option value="Diploma">
+            Diploma
+          </option>
+
+          <option value="Pharmacy">
+            Pharmacy
+          </option>
+
+          <option value="School">
+            School
+          </option>
+
+        </select>
 
         <label>Mobile Number</label>
         <input type="text" name="mobile">
@@ -77,17 +98,18 @@
         <br><br>
 
         <button type="submit" class="submit-btn">
-            Add Student
+          Add Student
         </button>
 
-    </form>
+      </form>
 
-</div>
+    </div>
 
-<br><br>
+    <br><br>
 
 
-</div>
+  </div>
 
 </body>
+
 </html>

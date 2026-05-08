@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash,session
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import csv
 from flask import Response
@@ -15,7 +16,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 
 
 app = Flask(__name__)
-app.secret_key = "mess_manager_secret"
+app.secret_key = 'messmanagersecretkey'
 
 def connect_db():
     return sqlite3.connect("database.db")
@@ -36,6 +37,43 @@ def create_tables():
     )
     """)
 
+    # admin table
+
+    conn.execute("""
+
+    CREATE TABLE IF NOT EXISTS admin(
+
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        username TEXT UNIQUE,
+
+        password TEXT
+
+    )
+
+    """)
+
+    # default admin
+
+    admin = conn.execute(
+
+        "SELECT * FROM admin WHERE username = ?",
+
+        ('admin',)
+
+    ).fetchone()
+
+
+    if not admin:
+
+        conn.execute(
+
+            "INSERT INTO admin (username, password) VALUES (?, ?)",
+
+            ('admin', 'admin123')
+
+        )
+
     # payments table
     conn.execute("""
     CREATE TABLE IF NOT EXISTS payments(
@@ -45,6 +83,22 @@ def create_tables():
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
+
+
+    # add admin_id column
+
+    try:
+
+        conn.execute(
+
+            "ALTER TABLE students ADD COLUMN admin_id INTEGER"
+
+        )
+
+    except:
+
+        pass
+
     
     # add joining_date column if not exists
     try:
@@ -85,47 +139,229 @@ def create_tables():
 create_tables()
 
 
+def login_required():
+
+    if 'admin_logged_in' not in session:
+
+        return redirect('/login')
+    
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+    if request.method == 'POST':
+
+        username = request.form['username']
+
+        password = request.form['password']
+
+        conn = connect_db()
+
+        admin = conn.execute(
+
+            """
+
+            SELECT *
+
+            FROM admin
+
+            WHERE username = ?
+
+            """,
+
+            (username,)
+
+        ).fetchone()
+
+        conn.close()
+
+
+        if admin and check_password_hash(admin[2], password):
+
+            session['admin_logged_in'] = True
+
+            session['admin_id'] = admin[0]
+
+            session['admin_username'] = admin[1]
+
+            flash('Login successful!')
+
+            return redirect('/')
+
+
+        else:
+
+            flash('Invalid username or password')
+
+            return redirect('/login')
+
+
+    return render_template('login.html')
+
+
+@app.route("/signup", methods=['GET', 'POST'])
+def signup():
+
+    if request.method == 'POST':
+
+        username = request.form['username']
+
+        password = request.form['password']
+
+        confirm_password = request.form['confirm_password']
+
+
+        # Password match validation
+
+        if password != confirm_password:
+
+            flash("Passwords do not match")
+
+            return redirect('/signup')
+
+
+        conn = connect_db()
+
+
+        # Check duplicate username
+
+        existing_admin = conn.execute(
+
+            "SELECT * FROM admin WHERE username = ?",
+
+            (username,)
+
+        ).fetchone()
+
+
+        if existing_admin:
+
+            conn.close()
+
+            flash("Username already exists")
+
+            return redirect('/signup')
+
+
+        # Create admin account
+
+        hashed_password = generate_password_hash(password)
+
+        conn.execute(
+
+            """
+
+            INSERT INTO admin (username, password)
+
+            VALUES (?, ?)
+
+            """,
+
+            (username, hashed_password)
+
+        )
+
+        conn.commit()
+
+        conn.close()
+
+
+        flash("Account created successfully!")
+
+        return redirect("/login")
+
+
+    return render_template("signup.html")
+
+
+@app.route('/logout')
+def logout():
+
+    session.pop('admin_logged_in', None)
+
+    flash('Logged out successfully!')
+
+    return redirect('/login')
 
 
 @app.route('/')
 def home():
 
+    check = login_required()
+
+    if check:
+
+        return check
+
     conn = connect_db()
 
+    admin_id = session['admin_id']
+
     total_students = conn.execute(
-        "SELECT COUNT(*) FROM students"
+        "SELECT COUNT(*) FROM students WHERE admin_id = ?"
+    ,
+    (admin_id,)
     ).fetchone()[0]
 
     total_collected = conn.execute(
-        "SELECT SUM(received_amount) FROM students"
+        "SELECT SUM(received_amount) FROM students WHERE admin_id = ?"
+    ,
+    (admin_id,)
     ).fetchone()[0]
 
     total_pending = conn.execute(
-        "SELECT SUM(remaining_amount) FROM students"
+        "SELECT SUM(remaining_amount) FROM students WHERE admin_id = ?"
+    ,
+    (admin_id,)
     ).fetchone()[0]
 
     pending_students = conn.execute(
+
         """
+
         SELECT COUNT(*)
+
         FROM students
-        WHERE remaining_amount > 0
-        """
+
+        WHERE admin_id = ?
+
+        AND remaining_amount > 0
+
+        """,
+
+        (admin_id,)
+
     ).fetchone()[0]
+    
 
     recent_payments = conn.execute(
-    """
-    SELECT students.name, payments.amount, payments.date
 
-    FROM payments
+        """
 
-    JOIN students
-    ON payments.student_id = students.id
+        SELECT students.name,
 
-    ORDER BY payments.id DESC
+            payments.amount,
 
-    LIMIT 5
-    """
-).fetchall()
+            payments.date
+
+        FROM payments
+
+        JOIN students
+
+        ON payments.student_id = students.id
+
+        WHERE students.admin_id = ?
+
+        ORDER BY payments.id DESC
+
+        LIMIT 5
+
+        """,
+
+        (admin_id,)
+
+    ).fetchall()
+
 
     conn.close()
 
@@ -148,13 +384,21 @@ def home():
 
 @app.route('/add_student_page')
 def add_student_page():
+    check = login_required()
+
+    if check:
+
+         return check
     return render_template("add_student.html")
-
-
 
 
 @app.route('/student_list')
 def student_list():
+    check = login_required()
+
+    if check:
+
+         return check
 
     search = request.args.get('search')
 
@@ -162,6 +406,8 @@ def student_list():
 
     conn = connect_db()
 
+    
+    admin_id = session['admin_id']
 
     # BOTH hostel + search
 
@@ -173,7 +419,9 @@ def student_list():
 
             SELECT * FROM students
 
-            WHERE hostel = ?
+            WHERE admin_id =? 
+            
+            AND hostel = ?
 
             AND (
 
@@ -188,6 +436,7 @@ def student_list():
             """,
 
             (
+                admin_id,
 
                 hostel,
 
@@ -208,9 +457,9 @@ def student_list():
 
         students = conn.execute(
 
-            "SELECT * FROM students WHERE hostel = ?",
+            "SELECT * FROM students WHERE admin_id = ? AND hostel = ?",
 
-            (hostel,)
+            (admin_id,hostel)
 
         ).fetchall()
 
@@ -225,7 +474,9 @@ def student_list():
 
             SELECT * FROM students
 
-            WHERE
+            WHERE admin_id = ?
+
+            AND  (
 
                 name LIKE ?
 
@@ -233,9 +484,12 @@ def student_list():
 
                 OR mobile LIKE ?
 
+                )
+
             """,
 
             (
+                admin_id,
                 f"{search}%",
                 f"{search}%",
                 f"{search}%"
@@ -243,7 +497,7 @@ def student_list():
             )
 
         ).fetchall()
-
+        
 
     # NO filters
 
@@ -251,7 +505,15 @@ def student_list():
 
         students = conn.execute(
 
-            "SELECT * FROM students"
+            """
+            SELECT * FROM students 
+            WHERE admin_id = ?
+
+            """
+
+        ,
+
+        (admin_id,)
 
         ).fetchall()
 
@@ -269,6 +531,11 @@ def student_list():
 
 @app.route('/payment_page')
 def payment_page():
+    check = login_required()
+
+    if check:
+
+        return check
 
     conn = connect_db()
 
@@ -281,25 +548,30 @@ def payment_page():
     return render_template("payment.html", students=students)
 
 
-
 @app.route('/add_student', methods=['GET', 'POST'])
 def add_student():
+    check = login_required()
+
+    if check:
+
+        return check
 
     if request.method == 'POST':
 
         name = request.form['name']
         room = request.form['room']
         hostel = request.form['hostel']
+        admin_id = session['admin_id']
 
         conn = connect_db()
 
         conn.execute(
             """
             INSERT INTO students
-            (name, room, hostel)
-            VALUES (?, ?, ?)
+            (name, room, hostel,admin_id)
+            VALUES (?, ?, ?, ?)
             """,
-            (name, room, hostel)
+            (name, room, hostel, admin_id)
         )
 
         conn.commit()
@@ -314,8 +586,40 @@ def add_student():
 
 @app.route('/delete_student/<int:student_id>')
 def delete_student(student_id):
+    check = login_required()
+
+    if check:
+
+        return check
 
     conn = connect_db()
+    admin_id = session['admin_id']
+
+    student = conn.execute(
+
+        """
+
+        SELECT *
+
+        FROM students
+
+        WHERE id = ?
+
+        AND admin_id = ?
+
+        """,
+
+        (student_id, admin_id)
+
+    ).fetchone()
+
+    if not student:
+
+        conn.close()
+
+        flash("Unauthorized delete attempt")
+
+        return redirect('/student_list')
 
     # delete payment history first
     conn.execute(
@@ -340,8 +644,40 @@ def delete_student(student_id):
 
 @app.route('/payment_history/<int:student_id>')
 def payment_history(student_id):
+    check = login_required()
+
+    if check:
+
+        return check
 
     conn = connect_db()
+    admin_id = session['admin_id']
+
+    student = conn.execute(
+
+        """
+
+        SELECT *
+
+        FROM students
+
+        WHERE id = ?
+
+        AND admin_id = ?
+
+        """,
+
+        (student_id, admin_id)
+
+    ).fetchone()
+    
+    if not student:
+
+        conn.close()
+
+        flash("Unauthorized access")
+
+        return redirect('/student_list')
 
     history = conn.execute(
         "SELECT amount, date FROM payments WHERE student_id = ? ORDER BY date DESC",
@@ -353,58 +689,171 @@ def payment_history(student_id):
     return render_template("payment_history.html", history=history)
 
 
-
-
 @app.route('/receive_payment', methods=['POST'])
 def receive_payment():
+    check = login_required()
+
+    if check:
+
+        return check
 
     student_id = request.form['student_id']
+
     amount = int(request.form['amount'])
 
     conn = connect_db()
+    admin_id = session['admin_id']
 
-    # get current values
+
+    # Prevent zero or negative payment
+
+    if amount <= 0:
+
+        flash("Payment amount must be greater than 0")
+
+        conn.close()
+
+        return redirect(f'/student_profile/{student_id}')
+
+
+    # Get current student data
+
     student = conn.execute(
-        "SELECT received_amount, remaining_amount FROM students WHERE id = ?",
-        (student_id,)
+
+        """
+
+        SELECT received_amount,
+
+            remaining_amount
+
+        FROM students
+
+        WHERE id = ?
+
+        AND admin_id = ?
+
+        """,
+
+        (student_id,admin_id)
+
     ).fetchone()
 
-    received = student[0] + amount
-    remaining = student[1] - amount
+    if not student:
 
-    # update database
+        conn.close()
+
+        flash("Unauthorized payment attempt")
+
+        return redirect('/student_list')
+
+    current_received = student[0]
+
+    current_remaining = student[1]
+
+
+    # Prevent overpayment
+
+    if amount > current_remaining:
+
+        flash("Payment exceeds remaining amount")
+
+        conn.close()
+
+        return redirect(f'/student_profile/{student_id}')
+
+
+    # Calculate updated values
+
+    new_received = current_received + amount
+
+    new_remaining = current_remaining - amount
+
+
+    # Update student table
+
     conn.execute(
-        "UPDATE students SET received_amount = ?, remaining_amount = ? WHERE id = ?",
-        (received, remaining, student_id)
+
+        """
+
+        UPDATE students
+
+        SET received_amount = ?,
+
+            remaining_amount = ?
+
+        WHERE id = ?
+
+        """,
+
+        (new_received, new_remaining, student_id)
+
     )
 
+
+    # Store payment history
+
     conn.execute(
-        "INSERT INTO payments (student_id, amount) VALUES (?, ?)",
+
+        """
+
+        INSERT INTO payments (student_id, amount)
+
+        VALUES (?, ?)
+
+        """,
+
         (student_id, amount)
-)
+
+    )
+
 
     conn.commit()
+
     conn.close()
 
+
     flash("Payment received successfully!")
+
     return redirect(f'/student_profile/{student_id}')
-
-
-@app.route('/test')
-def test():
-    return "Test route working"
 
 
 
 @app.route('/edit_student/<int:student_id>')
 def edit_student(student_id):
+    check = login_required()
+
+    if check:
+
+        return check
 
     conn = connect_db()
+    admin_id = session['admin_id']
 
     student = conn.execute(
-        "SELECT * FROM students WHERE id = ?",
-        (student_id,)
+
+        """
+
+        SELECT *
+
+        FROM students
+
+        WHERE id = ?
+
+        AND admin_id = ?
+
+        """,
+
+        (student_id, admin_id)
+
     ).fetchone()
+
+    if not student:
+
+        conn.close()
+
+        flash("Unauthorized access")
+
+        return redirect('/student_list')
 
     conn.close()
 
@@ -413,6 +862,11 @@ def edit_student(student_id):
 
 @app.route('/update_student', methods=['POST'])
 def update_student():
+    check = login_required()
+
+    if check:
+
+        return check
 
     student_id = request.form['student_id']
     name = request.form['name']
@@ -423,6 +877,32 @@ def update_student():
     academic_level = request.form['academic_level']
 
     conn = connect_db()
+    admin_id = session['admin_id']
+    student = conn.execute(
+
+        """
+
+        SELECT *
+
+        FROM students
+
+        WHERE id = ?
+
+        AND admin_id = ?
+
+        """,
+
+        (student_id, admin_id)
+
+    ).fetchone()
+
+    if not student:
+
+        conn.close()
+
+        flash("Unauthorized update attempt")
+
+        return redirect('/student_list')
 
     conn.execute(
         """
@@ -435,8 +915,10 @@ def update_student():
         mobile=?,
         department=?,
         academic_level=?
+        admin_id=?
 
         WHERE id=?
+        AND admin_id=?
         """,
 
         (
@@ -460,13 +942,40 @@ def update_student():
 
 @app.route("/student_profile/<int:student_id>")
 def student_profile(student_id):
+    check = login_required()
+
+    if check:
+
+        return check
 
     conn = connect_db()
+    admin_id = session['admin_id']
 
     student = conn.execute(
-        "SELECT * FROM students WHERE id = ?",
-        (student_id,)
+
+        """
+
+        SELECT *
+
+        FROM students
+
+        WHERE id = ?
+
+        AND admin_id = ?
+
+        """,
+
+        (student_id, admin_id)
+
     ).fetchone()
+
+    if not student:
+
+        conn.close()
+
+        flash("Unauthorized access")
+
+        return redirect('/student_list')
 
     payments = conn.execute(
         "SELECT amount, date FROM payments WHERE student_id = ? ORDER BY date DESC",
@@ -482,9 +991,13 @@ def student_profile(student_id):
     )
 
 
-
 @app.route('/receive_payment_page/<int:student_id>')
 def receive_payment_page(student_id):
+    check = login_required()
+
+    if check:
+
+        return check
 
     conn = connect_db()
 
@@ -502,15 +1015,33 @@ def receive_payment_page(student_id):
 
 @app.route("/pending_payments")
 def pending_payments():
+    check = login_required()
+
+    if check:
+
+        return check
 
     conn = connect_db()
+    admin_id = session['admin_id']
 
     students = conn.execute(
+
         """
-        SELECT * FROM students
-        WHERE remaining_amount > 0
+
+        SELECT *
+
+        FROM students
+
+        WHERE admin_id = ?
+
+        AND remaining_amount > 0
+
         ORDER BY remaining_amount DESC
-        """
+
+        """,
+
+        (admin_id,)
+
     ).fetchall()
 
     conn.close()
@@ -523,16 +1054,33 @@ def pending_payments():
 
 @app.route('/download_pending_pdf')
 def download_pending_pdf():
+    check = login_required()
+
+    if check:
+
+        return check
 
     conn = connect_db()
+    admin_id = session['admin_id']
 
     students = conn.execute(
+
         """
+
         SELECT name, hostel, remaining_amount
+
         FROM students
-        WHERE remaining_amount > 0
+
+        WHERE admin_id = ?
+
+        AND remaining_amount > 0
+
         ORDER BY remaining_amount DESC
-        """
+
+        """,
+
+        (admin_id,)
+
     ).fetchall()
 
     conn.close()
@@ -615,17 +1163,38 @@ def download_pending_pdf():
 
 @app.route('/download_students_pdf')
 def download_students_pdf():
+    check = login_required()
+
+    if check:
+
+        return check
 
     conn = connect_db()
+    admin_id = session['admin_id']
 
     students = conn.execute(
-        """
-        SELECT name, hostel, room, remaining_amount
-        FROM students
-        ORDER BY name
-        """
-    ).fetchall()
 
+        """
+
+        SELECT name,
+
+            hostel,
+
+            room,
+
+            remaining_amount
+
+        FROM students
+
+        WHERE admin_id = ?
+
+        ORDER BY name
+
+        """,
+
+        (admin_id,)
+
+    ).fetchall()
     conn.close()
 
     pdf_file = "students_report.pdf"

@@ -1183,3 +1183,102 @@ select {
 
     color: #0f172a !important;
 }
+
+/* =========================
+   Login Page
+========================= */
+
+.login-page {
+
+    margin: 0;
+
+    background: #f3f4f6;
+
+    font-family: Arial, sans-serif;
+}
+
+
+.login-container {
+
+    height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+}
+
+
+.login-card {
+
+    width: 360px;
+
+    background: white;
+
+    padding: 40px;
+
+    border-radius: 20px;
+
+    box-shadow: 0px 6px 20px rgba(0,0,0,0.08);
+}
+
+
+.login-card h1 {
+
+    margin: 0;
+
+    color: #111827;
+
+    font-size: 34px;
+}
+
+
+.login-card p {
+
+    color: #6b7280;
+
+    margin-bottom: 28px;
+}
+
+
+.login-card form {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+
+.login-card input {
+
+    padding: 14px;
+
+    border-radius: 10px;
+
+    border: 1px solid #d1d5db;
+
+    font-size: 15px;
+}
+
+
+.login-card button {
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #0f766e;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
