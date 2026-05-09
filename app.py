@@ -13,6 +13,9 @@ from reportlab.platypus import Spacer
 
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
+from functools import wraps
+import re
+
 
 
 app = Flask(__name__)
@@ -135,16 +138,23 @@ def create_tables():
     conn.commit()
     conn.close()
 
-
 create_tables()
 
 
-def login_required():
+def login_required(func):
 
-    if 'admin_logged_in' not in session:
+    @wraps(func)
 
-        return redirect('/login')
-    
+    def wrapper(*args, **kwargs):
+
+        if 'admin_logged_in' not in session:
+
+            return redirect('/login')
+
+        return func(*args, **kwargs)
+
+    return wrapper
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -204,11 +214,34 @@ def signup():
 
     if request.method == 'POST':
 
-        username = request.form['username']
+        username = request.form['username'].strip()
 
         password = request.form['password']
 
         confirm_password = request.form['confirm_password']
+
+        # Password strength validation
+
+        if len(password) < 8:
+
+            flash("Password must be at least 8 characters")
+
+            return redirect('/signup')
+
+
+        if not re.search(r"[A-Za-z]", password):
+
+            flash("Password must contain letters")
+
+            return redirect('/signup')
+
+
+        if not re.search(r"[0-9]", password):
+
+            flash("Password must contain numbers")
+
+            return redirect('/signup')
+
 
 
         # Password match validation
@@ -221,6 +254,21 @@ def signup():
 
 
         conn = connect_db()
+
+        # Username validation
+
+        if len(username) < 4:
+
+            flash("Username must be at least 4 characters")
+
+            return redirect('/signup')
+
+
+        if not re.match(r"^[A-Za-z0-9_]+$", username):
+
+            flash("Username can only contain letters, numbers and underscore")
+
+            return redirect('/signup')
 
 
         # Check duplicate username
@@ -285,13 +333,8 @@ def logout():
 
 
 @app.route('/')
+@login_required
 def home():
-
-    check = login_required()
-
-    if check:
-
-        return check
 
     conn = connect_db()
 
@@ -383,23 +426,14 @@ def home():
 
 
 @app.route('/add_student_page')
+@login_required
 def add_student_page():
-    check = login_required()
-
-    if check:
-
-         return check
     return render_template("add_student.html")
 
 
 @app.route('/student_list')
+@login_required
 def student_list():
-    check = login_required()
-
-    if check:
-
-         return check
-
     search = request.args.get('search')
 
     hostel = request.args.get('hostel')
@@ -530,13 +564,8 @@ def student_list():
 
 
 @app.route('/payment_page')
+@login_required
 def payment_page():
-    check = login_required()
-
-    if check:
-
-        return check
-
     conn = connect_db()
 
     students = conn.execute(
@@ -549,18 +578,16 @@ def payment_page():
 
 
 @app.route('/add_student', methods=['GET', 'POST'])
+@login_required
 def add_student():
-    check = login_required()
-
-    if check:
-
-        return check
-
     if request.method == 'POST':
 
-        name = request.form['name']
-        room = request.form['room']
-        hostel = request.form['hostel']
+        name = request.form['name'].strip()
+        room = request.form['room'].strip()
+        hostel = request.form['hostel'].strip()
+        department = request.form['department'].strip()
+        mobile = request.form['mobile'].strip()
+        academic_level = request.form['academic_level'].strip()
         admin_id = session['admin_id']
 
         conn = connect_db()
@@ -568,10 +595,18 @@ def add_student():
         conn.execute(
             """
             INSERT INTO students
-            (name, room, hostel,admin_id)
-            VALUES (?, ?, ?, ?)
+            (
+                name,
+                room,
+                hostel,
+                department,
+                mobile,
+                academic_level,
+                admin_id
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-            (name, room, hostel, admin_id)
+            (name, room, hostel, department, mobile, academic_level, admin_id)
         )
 
         conn.commit()
@@ -586,12 +621,6 @@ def add_student():
 
 @app.route('/delete_student/<int:student_id>')
 def delete_student(student_id):
-    check = login_required()
-
-    if check:
-
-        return check
-
     conn = connect_db()
     admin_id = session['admin_id']
 
@@ -643,13 +672,8 @@ def delete_student(student_id):
 
 
 @app.route('/payment_history/<int:student_id>')
+@login_required
 def payment_history(student_id):
-    check = login_required()
-
-    if check:
-
-        return check
-
     conn = connect_db()
     admin_id = session['admin_id']
 
@@ -690,12 +714,9 @@ def payment_history(student_id):
 
 
 @app.route('/receive_payment', methods=['POST'])
+@login_required
 def receive_payment():
-    check = login_required()
 
-    if check:
-
-        return check
 
     student_id = request.form['student_id']
 
@@ -817,14 +838,10 @@ def receive_payment():
     return redirect(f'/student_profile/{student_id}')
 
 
-
 @app.route('/edit_student/<int:student_id>')
+@login_required
 def edit_student(student_id):
-    check = login_required()
-
-    if check:
-
-        return check
+ 
 
     conn = connect_db()
     admin_id = session['admin_id']
@@ -861,20 +878,17 @@ def edit_student(student_id):
 
 
 @app.route('/update_student', methods=['POST'])
+@login_required
 def update_student():
-    check = login_required()
+ 
 
-    if check:
-
-        return check
-
-    student_id = request.form['student_id']
-    name = request.form['name']
-    room = request.form['room']
-    hostel = request.form['hostel']
-    mobile = request.form['mobile']
-    department = request.form['department']
-    academic_level = request.form['academic_level']
+    student_id = request.form['student_id'].strip()
+    name = request.form['name'].strip()
+    room = request.form['room'].strip()
+    hostel = request.form['hostel'].strip()
+    mobile = request.form['mobile'].strip()
+    department = request.form['department'].strip()
+    academic_level = request.form['academic_level'].strip()
 
     conn = connect_db()
     admin_id = session['admin_id']
@@ -903,6 +917,47 @@ def update_student():
         flash("Unauthorized update attempt")
 
         return redirect('/student_list')
+    
+
+    # Mobile validation
+
+    if not re.match(r"^[0-9]{10}$", mobile):
+
+        flash("Mobile number must contain exactly 10 digits")
+
+        conn.close()
+
+        return redirect(f'/edit_student/{student_id}')
+    
+    # Duplicate mobile validation
+
+    existing_mobile = conn.execute(
+
+        """
+
+        SELECT *
+
+        FROM students
+
+        WHERE mobile = ?
+
+        AND id != ?
+
+        AND admin_id = ?
+
+        """,
+
+        (mobile, student_id, admin_id)
+
+    ).fetchone()
+
+    if existing_mobile:
+
+        conn.close()
+
+        flash("Mobile number already exists")
+
+        return redirect(f'/edit_student/{student_id}')
 
     conn.execute(
         """
@@ -941,12 +996,9 @@ def update_student():
 
 
 @app.route("/student_profile/<int:student_id>")
+@login_required
 def student_profile(student_id):
-    check = login_required()
-
-    if check:
-
-        return check
+ 
 
     conn = connect_db()
     admin_id = session['admin_id']
@@ -992,12 +1044,9 @@ def student_profile(student_id):
 
 
 @app.route('/receive_payment_page/<int:student_id>')
+@login_required
 def receive_payment_page(student_id):
-    check = login_required()
-
-    if check:
-
-        return check
+ 
 
     conn = connect_db()
 
@@ -1013,13 +1062,11 @@ def receive_payment_page(student_id):
         student=student
     )
 
+
 @app.route("/pending_payments")
+@login_required
 def pending_payments():
-    check = login_required()
-
-    if check:
-
-        return check
+ 
 
     conn = connect_db()
     admin_id = session['admin_id']
@@ -1053,12 +1100,9 @@ def pending_payments():
 
 
 @app.route('/download_pending_pdf')
+@login_required
 def download_pending_pdf():
-    check = login_required()
-
-    if check:
-
-        return check
+ 
 
     conn = connect_db()
     admin_id = session['admin_id']
@@ -1161,13 +1205,11 @@ def download_pending_pdf():
         as_attachment=True
     )
 
+
 @app.route('/download_students_pdf')
+@login_required
 def download_students_pdf():
-    check = login_required()
-
-    if check:
-
-        return check
+ 
 
     conn = connect_db()
     admin_id = session['admin_id']
