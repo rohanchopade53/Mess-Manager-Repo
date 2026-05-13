@@ -12,21 +12,19 @@
 
         <div class="logo">
 
-    <div class="logo-title">
-        MESS MANAGER
-    </div>
+            <div class="logo-title">
+                MESS MANAGER
+            </div>
 
-    <div class="logo-subtitle">
-        Management Dashboard
-    </div>
+            <div class="logo-subtitle">
+                Management Dashboard
+            </div>
 
-</div>
+        </div>
 
         <div class="nav-links">
 
             <a href="/">Dashboard</a>
-
-            <a href="/add_student">Add Student</a>
 
             <a href="/student_list">Students</a>
 
@@ -39,41 +37,47 @@
     </div>
 
 
-<div class="dashboard-container">
+    <div class="dashboard-container">
 
-    <div class="dashboard-layout">
+        <div class="dashboard-layout">
 
-        <!-- Stats Cards -->
+            <!-- Stats Cards -->
 
 
-        <h1 class="dashboard-title">
-            Dashboard Overview
-        </h1>
+            <h1 class="dashboard-title">
+                Dashboard Overview
+            </h1>
 
-        <div class="dashboard-cards">
+            <div class="dashboard-cards">
 
-        <div class="dashboard-card">
-            <h3>Total Students</h3>
-            <p>{{ total_students }}</p>
+                <div class="dashboard-card">
+                    <h3>Total Students</h3>
+                    <p>{{ total_students }}</p>
+                </div>
+
+                <div class="dashboard-card">
+                    <h3>Pending Students</h3>
+                    <p>{{ pending_students }}</p>
+                </div>
+
+
+                <div class="dashboard-card">
+                    <h3>Total Collected</h3>
+                    <p>₹{{ total_collected }}</p>
+                </div>
+
+
+                <div class="dashboard-card">
+                    <h3>Total Pending</h3>
+                    <p>₹{{ total_pending }}</p>
+                </div>
+
+
+
+
+
+            </div>
         </div>
-
-        <div class="dashboard-card">
-            <h3>Total Collected</h3>
-            <p>₹{{ total_collected }}</p>
-        </div>
-
-        <div class="dashboard-card">
-            <h3>Total Pending</h3>
-            <p>₹{{ total_pending }}</p>
-        </div>
-
-        <div class="dashboard-card">
-            <h3>Pending Students</h3>
-            <p>{{ pending_students }}</p>
-        </div>
-
-    </div>
-    </div>
     </div>
 
 
@@ -151,7 +155,7 @@
 
     </div>
 
-    
+
 
 </body>
 

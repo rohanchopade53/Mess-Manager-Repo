@@ -17,8 +17,6 @@
 
             <a href="/">Dashboard</a>
 
-            <a href="/add_student">Add Student</a>
-
             <a href="/student_list">Students</a>
 
             <a href="/pending_payments">Pending</a>
@@ -52,7 +50,7 @@
             <div class="filter-buttons">
                 <a href="/student_list"><BUTTON>All Students</button></a>
                 <a href="/student_list?hostel=Shivneri"><button>Shivneri</button></a>
-                <a href="/student_list?hostel=Raygad"><button>Raygad</button></a>
+                <a href="/student_list?hostel=Raigad"><button>Raigad</button></a>
                 <a href="/student_list?hostel=Rajgad"><button>Rajgad</button></a>
             </div>
 
@@ -60,6 +58,7 @@
                 <a href="/download_students_pdf">
                     <button>Download PDF</button>
                 </a>
+
             </div>
 
         </div>
@@ -71,16 +70,27 @@
 
             <form method="GET" class="search-form">
 
+                
                 <input type="text" name="search" placeholder="Search by name, room or mobile"
                     value="{{ request.args.get('search', '') }}">
+
 
                 <button type="submit">
                     Search
                 </button>
 
+                <a href="/add_student" class="add-student-btn">
+
+                    + Add Student
+
+                </a>
+
             </form>
 
+
+
         </div>
+
         <br><br>
 
 
@@ -101,88 +111,90 @@
 
         {% endwith %}
 
-     <div class="table-panel">
+        <div class="table-panel">
+            
+            <div class="table-container">
 
-    <table id="studentTable" class="students-table">
+                <table id="studentTable" class="students-table">
 
-        <thead>
+                    <thead>
 
-            <tr>
+                        <tr>
 
-                <th>Name</th>
-                <th>Hostel</th>
-                <th>Room</th>
-                <th>Remaining</th>
-                <th>Status</th>
-                <th>Profile</th>
+                            <th>Name</th>
+                            <th>Hostel</th>
+                            <th>Room</th>
+                            <th>Remaining</th>
+                            <th>Status</th>
+                            <th>Profile</th>
 
-            </tr>
+                        </tr>
 
-        </thead>
+                    </thead>
 
-        <tbody>
+                    <tbody>
 
-            {% for student in students %}
+                        {% for student in students %}
 
-            <tr>
+                        <tr>
 
-                <td>{{ student[1] }}</td>
+                            <td>{{ student[1] }}</td>
 
-                <td>{{ student[3] }}</td>
+                            <td>{{ student[3] }}</td>
 
-                <td>{{ student[2] }}</td>
+                            <td>{{ student[2] }}</td>
 
-                <td>₹{{ student[5] }}</td>
+                            <td>₹{{ student[5] }}</td>
 
-                <td>
+                            <td>
 
-                    {% if student[5] == 0 %}
+                                {% if student[5] == 0 %}
 
-                    <span style="color: green; font-weight: bold;">
-                        Paid
-                    </span>
+                                <span style="color: green; font-weight: bold;">
+                                    Paid
+                                </span>
 
-                    {% elif student[4] == 0 %}
+                                {% elif student[4] == 0 %}
 
-                    <span style="color: red; font-weight: bold;">
-                        Pending
-                    </span>
+                                <span style="color: red; font-weight: bold;">
+                                    Pending
+                                </span>
 
-                    {% else %}
+                                {% else %}
 
-                    <span style="color: orange; font-weight: bold;">
-                        Partial
-                    </span>
+                                <span style="color: orange; font-weight: bold;">
+                                    Partial
+                                </span>
 
-                    {% endif %}
+                                {% endif %}
 
-                </td>
+                            </td>
 
-                <td>
+                            <td>
 
-                   <a href="/student_profile/{{ student[0] }}"
-                       class="table-action-btn">
+                                <a href="/student_profile/{{ student[0] }}" class="table-action-btn">
 
-                        View Profile
+                                    View Profile
 
-                    </a>
+                                </a>
 
-                </td>
+                            </td>
 
-            </tr>
+                        </tr>
 
-            {% endfor %}
+                        {% endfor %}
 
-        </tbody>
+                    </tbody>
 
-    </table>
+                </table>
+            </div>
 
-</div>
+        </div>
 
         <br><br>
 
 
-       
+
 
 
     </div>

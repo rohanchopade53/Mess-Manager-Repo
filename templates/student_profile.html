@@ -19,8 +19,6 @@
 
             <a href="/">Dashboard</a>
 
-            <a href="/add_student">Add Student</a>
-
             <a href="/student_list">Students</a>
 
             <a href="/pending_payments">Pending</a>
@@ -48,7 +46,7 @@
 
         <h3>Paid</h3>
 
-        <p>₹{{ student[4] }}</p>
+        <p>₹{{ student['received_amount'] }}</p>
 
     </div>
 
@@ -56,26 +54,26 @@
 
         <h3>Remaining</h3>
 
-        <p>₹{{ student[5] }}</p>
+        <p>₹{{ student['remaining_amount'] }}</p>
 
     </div>
 
 </div>
             <div class="profile-avatar">
 
-                {{ student[1][0] }}
+                {{ student['name'][0] }}
 
             </div>
 
             <div class="profile-info">
 
                 <h1 class="profile-name">
-                    {{ student[1] }}
+                    {{ student['name'] }}
                 </h1>
 
                 <p class="profile-subtitle">
 
-                    {{ student[3] }} Hostel • Room {{ student[2] }}
+                    {{ student['hostel'] }} Hostel • Room {{ student['room'] }}
 
                 </p>
 
@@ -85,19 +83,19 @@
 
         <div class="profile-buttons">
 
-            <a href="/edit_student/{{ student[0] }}">
+            <a href="/edit_student/{{ student['id'] }}">
                 <button class="edit-btn">
                     Edit Student
                 </button>
             </a>
 
-            <a href="/receive_payment_page/{{ student[0] }}">
+            <a href="/receive_payment_page/{{ student['id'] }}">
                 <button class="payment-btn">
                     Receive Payment
                 </button>
             </a>
 
-            <a href="/delete_student/{{ student[0] }}"
+            <a href="/delete_student/{{ student['id'] }}"
                 onclick="return confirm('Are you sure you want to delete this student?')">
 
                 <button class="delete-btn">
@@ -118,23 +116,23 @@
 
 
 
-            <p><b>Department:</b> {{ student[7] }}</p>
+            <p><b>Department:</b> {{ student['department'] }}</p>
 
-            <p><b>Mobile:</b> {{ student[8] }}</p>
+            <p><b>Mobile:</b> {{ student['mobile'] }}</p>
 
-            <p><b>Academic Level:</b> {{ student[9] }}</p>
+            <p><b>Academic Level:</b> {{ student['academic_level'] }}</p>
 
-            <p><b>Hostel:</b> {{ student[3] }}</p>
+            <p><b>Hostel:</b> {{ student['hostel'] }}</p>
 
-            <p><b>Room:</b> {{ student[2] }}</p>
+            <p><b>Room:</b> {{ student['room'] }}</p>
 
-            <p><b>Joining Date:</b> {{ student[6] }}</p>
+            <p><b>Joining Date:</b> {{ student['joining_date'] }}</p>
 
             <hr>
 
-            <p><b>Received Amount:</b> ₹{{ student[4] }}</p>
+            <p><b>Received Amount:</b> ₹{{ student['received_amount'] }}</p>
 
-            <p><b>Remaining Amount:</b> ₹{{ student[5] }}</p>
+            <p><b>Remaining Amount:</b> ₹{{ student['remaining_amount'] }}</p>
 
         </div>
 

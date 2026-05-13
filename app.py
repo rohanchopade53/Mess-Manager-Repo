@@ -22,8 +22,12 @@ app = Flask(__name__)
 app.secret_key = 'messmanagersecretkey'
 
 def connect_db():
-    return sqlite3.connect("database.db")
 
+    conn = sqlite3.connect('database.db')
+
+    conn.row_factory = sqlite3.Row
+
+    return conn
 
 def create_tables():
     conn = connect_db()
@@ -437,7 +441,7 @@ def student_list():
     search = request.args.get('search')
 
     hostel = request.args.get('hostel')
-
+    print(hostel)
     conn = connect_db()
 
     
@@ -558,9 +562,10 @@ def student_list():
 
         "student_list.html",
 
-        students=students
+        students=students,
 
-    )
+        hostel=hostel
+)
 
 
 @app.route('/payment_page')
@@ -591,7 +596,7 @@ def add_student():
         admin_id = session['admin_id']
 
         conn = connect_db()
-
+        joining_date = datetime.now().strftime("%d-%m-%Y")
         conn.execute(
             """
             INSERT INTO students
@@ -602,11 +607,12 @@ def add_student():
                 department,
                 mobile,
                 academic_level,
+                joining_date,
                 admin_id
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ? ,?)
             """,
-            (name, room, hostel, department, mobile, academic_level, admin_id)
+            (name, room, hostel, department, mobile, academic_level, joining_date, admin_id)
         )
 
         conn.commit()
@@ -803,10 +809,12 @@ def receive_payment():
             remaining_amount = ?
 
         WHERE id = ?
+        
+        AND admin_id=?
 
         """,
 
-        (new_received, new_remaining, student_id)
+        (new_received, new_remaining, student_id, admin_id)
 
     )
 
@@ -1070,27 +1078,98 @@ def pending_payments():
 
     conn = connect_db()
     admin_id = session['admin_id']
+    payment_filter = request.args.get('payment_filter')
 
-    students = conn.execute(
+    if payment_filter == "0_5000":
 
-        """
+        students = conn.execute(
 
-        SELECT *
+            """
 
-        FROM students
+            SELECT *
 
-        WHERE admin_id = ?
+            FROM students
 
-        AND remaining_amount > 0
+            WHERE admin_id = ?
 
-        ORDER BY remaining_amount DESC
+            AND remaining_amount BETWEEN 0 AND 5000
 
-        """,
+            ORDER BY remaining_amount ASC
 
-        (admin_id,)
+            """,
 
-    ).fetchall()
+            (admin_id,)
 
+        ).fetchall()
+
+
+    elif payment_filter == "5000_15000":
+
+        students = conn.execute(
+
+            """
+
+            SELECT *
+
+            FROM students
+
+            WHERE admin_id = ?
+
+            AND remaining_amount BETWEEN 5000 AND 15000
+
+            ORDER BY remaining_amount DESC
+
+            """,
+
+            (admin_id,)
+
+        ).fetchall()
+
+
+    elif payment_filter == "15000":
+
+        students = conn.execute(
+
+            """
+
+            SELECT *
+
+            FROM students
+
+            WHERE admin_id = ?
+
+            AND remaining_amount > 15000
+
+            ORDER BY remaining_amount DESC
+
+            """,
+
+            (admin_id,)
+
+        ).fetchall()
+
+
+    else:
+
+        students = conn.execute(
+
+            """
+
+            SELECT *
+
+            FROM students
+
+            WHERE admin_id = ?
+
+            AND remaining_amount > 0
+
+            ORDER BY remaining_amount DESC
+
+            """,
+
+            (admin_id,)
+
+        ).fetchall()
     conn.close()
 
     return render_template(

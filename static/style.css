@@ -23,6 +23,7 @@ body {
     width: 90%;
     max-width: 900px;
     margin: 20px auto;
+
 }
 
 
@@ -69,6 +70,7 @@ button:hover {
 /* Export button */
 .export-button button {
     background-color: #2f855a;
+    margin: 5px;
 }
 
 
@@ -76,21 +78,49 @@ button:hover {
     background-color: #38a169;
 }
 
+.add-student-btn {
 
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 14px 20px;
+
+    border-radius: 10px;
+
+    background: #0f766e;
+
+    color: white;
+
+    text-decoration: none;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    transition: 0.2s ease;
+}
+
+.add-student-btn:hover {
+
+    background: #115e59;
+}
 
 
 .delete-btn:hover {
     background-color: #e53e3e;
 }
 
-
 /* Tables */
 table {
+
     width: 100%;
     border-collapse: collapse;
     background: white;
     border-radius: 8px;
-    overflow: hidden;
+    
 }
 
 
@@ -991,6 +1021,7 @@ select {
    Search Panel
 ========================= */
 .search-panel {
+    width: auto;
 
     background: white;
 
@@ -998,20 +1029,26 @@ select {
 
     border-radius: 16px;
 
-    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0px 3px 10px rgba(56, 11, 11, 0.05);
 
-    margin-bottom: 20px;
+    margin-bottom: 2px;
 }
 
 .search-form {
+    
 
     display: flex;
+
+    align-items: center;
 
     gap: 16px;
 }
 
-
 .search-form input {
+
+    width: 100%;
+
+    box-sizing: border-box;
 
     flex: 1;
 
@@ -1027,13 +1064,15 @@ select {
 
 .search-form input:focus {
 
+
     outline: none;
 
     border-color: #0f766e;
 }
 
 
-.search-form button {
+.search-form button,
+.add-student-btn {
 
     padding: 14px 24px;
 
@@ -1050,12 +1089,24 @@ select {
     cursor: pointer;
 }
 
-
 /* =========================
    Students Table
 ========================= */
+.table-container {
+    
+
+    max-height: 500px;
+
+    overflow-y: auto;
+
+    overflow-x: auto;
+
+    border-radius: 18px;
+}
+
 
 .table-panel {
+    margin: 20 auto;
 
     background: white;
 
@@ -1070,6 +1121,7 @@ select {
 
 
 .students-table {
+    margin: 22px;
 
     width: 100%;
 
@@ -1179,9 +1231,15 @@ select {
 
 .students-table th {
 
-    background-color: #1a6b7c !important;
+    background-color: #1a6b7c;
 
-    color: #0f172a !important;
+    color: white;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 10;
 }
 
 /* =========================
@@ -1220,7 +1278,7 @@ select {
 
     border-radius: 20px;
 
-    box-shadow: 0px 6px 20px rgba(0,0,0,0.08);
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.08);
 }
 
 
