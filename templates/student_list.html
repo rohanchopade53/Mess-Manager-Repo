@@ -10,7 +10,7 @@
     <div class="topbar">
 
         <div class="logo">
-            Mess Manager
+            Mess Management
         </div>
 
         <div class="nav-links">
@@ -47,20 +47,6 @@
 
         <div class="toolbar">
 
-            <div class="filter-buttons">
-                <a href="/student_list"><BUTTON>All Students</button></a>
-                <a href="/student_list?hostel=Shivneri"><button>Shivneri</button></a>
-                <a href="/student_list?hostel=Raigad"><button>Raigad</button></a>
-                <a href="/student_list?hostel=Rajgad"><button>Rajgad</button></a>
-            </div>
-
-            <div class="export-button">
-                <a href="/download_students_pdf">
-                    <button>Download PDF</button>
-                </a>
-
-            </div>
-
         </div>
 
         <br><br>
@@ -70,7 +56,7 @@
 
             <form method="GET" class="search-form">
 
-                
+
                 <input type="text" name="search" placeholder="Search by name, room or mobile"
                     value="{{ request.args.get('search', '') }}">
 
@@ -79,13 +65,36 @@
                     Search
                 </button>
 
-                <a href="/add_student" class="add-student-btn">
 
-                    + Add Student
 
-                </a>
+                <select name="hostel" onchange="this.form.submit()">
+
+                    <option value="">
+                        All Hostels
+                    </option>
+
+                    <option value="Shivneri" {% if hostel=="Shivneri" %}selected{% endif %}>
+
+                        Shivneri
+
+                    </option>
+
+                    <option value="Rajgad" {% if hostel=="Rajgad" %}selected{% endif %}>
+
+                        Rajgad
+
+                    </option>
+
+                    <option value="Raigad" {% if hostel=="Raigad" %}selected{% endif %}>
+
+                        Raigad
+
+                    </option>
+
+                </select>
 
             </form>
+
 
 
 
@@ -111,8 +120,18 @@
 
         {% endwith %}
 
+
+        <div class="export-button">
+            <a href="/download_students_pdf">
+                <button>Download PDF</button>
+            </a>
+
+        </div>
+
         <div class="table-panel">
-            
+
+
+
             <div class="table-container">
 
                 <table id="studentTable" class="students-table">
@@ -236,6 +255,41 @@
         }
 
     </script>
+
+    <a href="/add_student" class="floating-add-btn">
+
+        ✦ Add Student
+
+    </a>
+
+    <footer class="app-footer">
+
+    <div class="footer-inner">
+
+        <h2>Mess Management</h2>
+
+        <p>
+
+            Simplifying hostel and mess operations with
+            organized student records and payment tracking.
+
+        </p>
+
+        <span>
+
+            Built with Flask • SQLite • Modern Dashboard UI
+
+        </span>
+
+        <div class="footer-copy">
+
+            © 2026 Mess Management System
+
+        </div>
+
+    </div>
+
+</footer>
 </body>
 
 </html>

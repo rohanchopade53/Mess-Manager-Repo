@@ -1,6 +1,18 @@
 /* Page background */
 body {
-    font-family: "Segoe UI", Arial, sans-serif;
+
+
+
+    min-height: 100vh;
+
+    display: flex;
+
+    flex-direction: column;
+
+
+    font-family: "Segoe UI",
+        Arial,
+        sans-serif;
     background-color: #f4f7fb;
     margin: 0;
 }
@@ -20,8 +32,9 @@ body {
 
 /* Page container */
 .container {
-    width: 90%;
-    max-width: 900px;
+    flex: 1;
+    width: 92%;
+    max-width: 1200px;
     margin: 20px auto;
 
 }
@@ -69,8 +82,10 @@ button:hover {
 
 /* Export button */
 .export-button button {
+    width: auto !important;
     background-color: #2f855a;
-    margin: 5px;
+    margin-left: 975px;
+    margin-bottom: 5px;
 }
 
 
@@ -120,7 +135,7 @@ table {
     border-collapse: collapse;
     background: white;
     border-radius: 8px;
-    
+
 }
 
 
@@ -174,7 +189,12 @@ select {
 
 
 /* Toolbar (student list buttons row) */
+
+
 .toolbar {
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto 20px auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -182,10 +202,7 @@ select {
 }
 
 
-.filter-buttons {
-    display: flex;
-    gap: 8px;
-}
+
 
 
 /* Payment page search box */
@@ -989,9 +1006,10 @@ select {
 
     display: flex;
 
-    justify-content: space-between;
+    justify-content: center;
 
     align-items: center;
+
 
     margin-bottom: 18px;
 }
@@ -1021,36 +1039,59 @@ select {
    Search Panel
 ========================= */
 .search-panel {
-    width: auto;
+
+    width: 100%;
+
+    max-width: 650px;
+
+    margin: 0 auto;
 
     background: white;
 
-    padding: 18px;
+    padding: 22px;
 
     border-radius: 16px;
 
     box-shadow: 0px 3px 10px rgba(56, 11, 11, 0.05);
+}
 
-    margin-bottom: 2px;
+.filter-buttons {
+
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
 }
 
 .search-form {
-    
+
+    max-width: 100% !important;
+
+    width: 100% !important;
+
+    background: transparent !important;
+
+    box-shadow: none !important;
+
+    padding: 0 !important;
+
+    margin: 0 !important;
 
     display: flex;
 
     align-items: center;
 
     gap: 16px;
+
+    flex-wrap: wrap;
 }
 
 .search-form input {
 
-    width: 100%;
-
-    box-sizing: border-box;
-
     flex: 1;
+
+    min-width: 280px;
 
     padding: 14px;
 
@@ -1059,6 +1100,19 @@ select {
     border: 1px solid #d1d5db;
 
     font-size: 15px;
+
+    box-sizing: border-box;
+}
+
+.search-form select {
+
+    min-width: 170px;
+
+    padding: 14px;
+
+    border-radius: 10px;
+
+    border: 1px solid #d1d5db;
 }
 
 
@@ -1074,7 +1128,7 @@ select {
 .search-form button,
 .add-student-btn {
 
-    padding: 14px 24px;
+    padding: 14px 30px;
 
     border-radius: 10px;
 
@@ -1093,7 +1147,7 @@ select {
    Students Table
 ========================= */
 .table-container {
-    
+
 
     max-height: 500px;
 
@@ -1110,7 +1164,7 @@ select {
 
     background: white;
 
-    padding: 24px;
+    padding: 20px;
 
     border-radius: 18px;
 
@@ -1184,6 +1238,57 @@ select {
     color: white;
 }
 
+
+.floating-add-btn {
+
+    position: fixed;
+
+    bottom: 28px;
+
+    right: 28px;
+
+    z-index: 1000;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 16px 22px;
+
+    border-radius: 50px;
+
+    background: linear-gradient(135deg, #0f766e, #115e59);
+
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.3px;
+
+    box-shadow:
+        0px 10px 25px rgba(15, 118, 110, 0.28),
+        0px 4px 10px rgba(0, 0, 0, 0.12);
+
+    transition: all 0.22s ease;
+}
+
+.floating-add-btn:hover {
+
+    transform: translateY(-4px) scale(1.03);
+
+    box-shadow:
+        0px 14px 28px rgba(15, 118, 110, 0.35),
+        0px 6px 14px rgba(0, 0, 0, 0.14);
+}
+
 /* ===== FINAL DASHBOARD GRID ===== */
 
 .dashboard-cards {
@@ -1248,29 +1353,25 @@ select {
 
 .login-page {
 
-    margin: 0;
-
-    background: #f3f4f6;
-
-    font-family: Arial, sans-serif;
-}
-
-
-.login-container {
-
-    height: 100vh;
+    min-height: 100vh;
 
     display: flex;
 
     justify-content: center;
 
     align-items: center;
+
+    background: #f3f4f6;
+
+    font-family: Arial, sans-serif;
+
+    margin: 0;
 }
 
 
 .login-card {
 
-    width: 360px;
+    width: 420px;
 
     background: white;
 
@@ -1280,6 +1381,7 @@ select {
 
     box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.08);
 }
+
 
 
 .login-card h1 {
@@ -1302,11 +1404,27 @@ select {
 
 .login-card form {
 
+
+    background: transparent !important;
+
+    box-shadow: none !important;
+
+    padding: 0 !important;
+
+    border-radius: 0 !important;
+
     display: flex;
 
     flex-direction: column;
 
     gap: 18px;
+
+    width: 100%;
+
+    max-width: 100%;
+
+    margin: 0;
+
 }
 
 
@@ -1339,4 +1457,69 @@ select {
     font-weight: 600;
 
     cursor: pointer;
+}
+
+.app-footer {
+
+    margin-top: 70px;
+    padding: 55px 20px;
+    background: transparent;
+}
+
+
+.footer-inner {
+
+    max-width: 700px;
+
+    margin: auto;
+
+    text-align: center;
+}
+
+
+.footer-inner h2 {
+
+    margin: 0;
+
+    font-size: 30px;
+
+    color: #111827;
+
+    font-weight: 700;
+}
+
+
+.footer-inner p {
+
+    margin-top: 18px;
+
+    color: #6b7280;
+
+    font-size: 16px;
+
+    line-height: 1.7;
+}
+
+
+.footer-inner span {
+
+    display: block;
+
+    margin-top: 20px;
+
+    color: #0f766e;
+
+    font-weight: 600;
+
+    font-size: 14px;
+}
+
+
+.footer-copy {
+
+    margin-top: 28px;
+
+    color: #9ca3af;
+
+    font-size: 14px;
 }

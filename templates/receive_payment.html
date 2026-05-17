@@ -13,7 +13,7 @@
 <div class="topbar">
 
     <div class="logo">
-        Mess Manager
+        Mess Management
     </div>
 
     <div class="nav-links">
@@ -36,21 +36,21 @@
 
 <div class="payment-card">
 
-<h3>{{ student[1] }}</h3>
+<h3>{{ student['name'] }}</h3>
 
-<p><b>Remaining Amount:</b> ₹{{ student[5] }}</p>
+<p><b>Remaining Amount:</b> ₹{{ student['remaining_amount'] }}</p>
 
 <form action="/receive_payment" method="POST">
 
 <input type="hidden"
 name="student_id"
-value="{{ student[0] }}">
+value="{{ student['id'] }}">
 
 Enter Amount:
 
 <input type="number"
 name="amount"
-max="{{ student[5] }}"
+max="{{ student['remaining_amount'] }}"
 required>
 
 <br><br>
@@ -65,13 +65,40 @@ Receive Payment
 
 <br>
 
-<a href="/student_profile/{{ student[0] }}">
+<a href="/student_profile/{{ student['id'] }}">
     <button>Back to Profile</button>
 </a>
 
 
 
 </div>
+<footer class="app-footer">
 
+    <div class="footer-inner">
+
+        <h2>Mess Management</h2>
+
+        <p>
+
+            Simplifying hostel and mess operations with
+            organized student records and payment tracking.
+
+        </p>
+
+        <span>
+
+            Built with Flask • SQLite • Modern Dashboard UI
+
+        </span>
+
+        <div class="footer-copy">
+
+            © 2026 Mess Management System
+
+        </div>
+
+    </div>
+
+</footer>
 </body>
 </html>
