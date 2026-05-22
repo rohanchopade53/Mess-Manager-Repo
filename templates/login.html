@@ -23,6 +23,25 @@
 
             {% with messages = get_flashed_messages() %}
 
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="success-message">
+
+                {{ message }}
+
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+{% endwith %}
+
+
+            {% with messages = get_flashed_messages() %}
+
             {% if messages %}
 
             {% for message in messages %}

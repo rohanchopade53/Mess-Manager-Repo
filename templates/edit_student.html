@@ -39,7 +39,7 @@ value="{{ student[0] }}">
 Name:
 <input type="text"
 name="name"
-value="{{ student[1] }}"
+value="{{ student['name'] }}"
 required>
 
 <br><br>
@@ -47,7 +47,7 @@ required>
 Mobile:
 <input type="text"
 name="mobile"
-value="{{ student[8] }}"
+value="{{ student['mobile'] }}"
 required>
 
 <br><br>
@@ -57,22 +57,22 @@ Department:
 <select name="department" required>
 
 <option value="Engineering"
-{% if student[7] == 'Engineering' %}selected{% endif %}>
+{% if student['department'] == 'Engineering' %}selected{% endif %}>
 Engineering
 </option>
 
 <option value="Diploma"
-{% if student[7] == 'Diploma' %}selected{% endif %}>
+{% if student['department'] == 'Diploma' %}selected{% endif %}>
 Diploma
 </option>
 
 <option value="Pharmacy"
-{% if student[7] == 'Pharmacy' %}selected{% endif %}>
+{% if student['department'] == 'Pharmacy' %}selected{% endif %}>
 Pharmacy
 </option>
 
 <option value="School"
-{% if student[7] == 'School' %}selected{% endif %}>
+{% if student['department'] == 'School' %}selected{% endif %}>
 School
 </option>
 
@@ -83,7 +83,7 @@ School
 Academic Level:
 <input type="text"
 name="academic_level"
-value="{{ student[9] }}"
+value="{{ student['academic_level'] }}"
 required>
 
 <br><br>
@@ -91,7 +91,7 @@ required>
 Room:
 <input type="text"
 name="room"
-value="{{ student[2] }}"
+value="{{ student['room'] }}"
 required>
 
 <br><br>
@@ -101,17 +101,17 @@ Hostel:
 <select name="hostel">
 
 <option value="Shivneri"
-{% if student[3] == 'Shivneri' %}selected{% endif %}>
+{% if student['hostel'] == 'Shivneri' %}selected{% endif %}>
 Shivneri
 </option>
 
 <option value="Raigad"
-{% if student[3] == 'Raigad' %}selected{% endif %}>
+{% if student['hostel'] == 'Raigad' %}selected{% endif %}>
 Raygad
 </option>
 
 <option value="Rajgad"
-{% if student[3] == 'Rajgad' %}selected{% endif %}>
+{% if student['hostel'] == 'Rajgad' %}selected{% endif %}>
 Rajgad
 </option>
 

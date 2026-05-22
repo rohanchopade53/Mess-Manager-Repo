@@ -157,23 +157,23 @@
 
                         <tr>
 
-                            <td>{{ student[1] }}</td>
+                            <td>{{ student['name'] }}</td>
 
-                            <td>{{ student[3] }}</td>
+                            <td>{{ student['hostel'] }}</td>
 
-                            <td>{{ student[2] }}</td>
+                            <td>{{ student['room'] }}</td>
 
-                            <td>₹{{ student[5] }}</td>
+                            <td>₹{{ student['total_fees'] - student['received_amount'] }}</td>
 
                             <td>
 
-                                {% if student[5] == 0 %}
+                                {% if student['total_fees'] - student['received_amount'] == 0 %}
 
                                 <span style="color: green; font-weight: bold;">
                                     Paid
                                 </span>
 
-                                {% elif student[4] == 0 %}
+                                {% elif student['received_amount'] == 0 %}
 
                                 <span style="color: red; font-weight: bold;">
                                     Pending

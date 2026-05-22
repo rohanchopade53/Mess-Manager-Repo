@@ -31,6 +31,25 @@
 
     <div class="container">
 
+
+        {% with messages = get_flashed_messages() %}
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="success-message">
+
+                {{ message }}
+
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+{% endwith %}
+
         <div class="profile-header">
             <div class="profile-summary">
 
@@ -54,14 +73,14 @@
 
         <h3>Remaining</h3>
 
-        <p>₹{{ student['remaining_amount'] }}</p>
+        <p>₹{{ student['total_fees'] - student['received_amount']}}</p>
 
     </div>
 
 </div>
             <div class="profile-avatar">
 
-                {{ student['name'][0] }}
+                {{ student['name']['id'] }}
 
             </div>
 
@@ -132,7 +151,7 @@
 
             <p><b>Received Amount:</b> ₹{{ student['received_amount'] }}</p>
 
-            <p><b>Remaining Amount:</b> ₹{{ student['remaining_amount'] }}</p>
+            <p><b>Remaining Amount:</b> ₹{{ student ['total_fees'] - student['received_amount'] }}</p>
 
         </div>
 
@@ -152,8 +171,8 @@
             {% for payment in payments %}
 
             <tr>
-                <td>₹{{ payment[0] }}</td>
-                <td>{{ payment[1] }}</td>
+                <td>₹{{ payment['id'] }}</td>
+                <td>{{ payment['name'] }}</td>
             </tr>
 
             {% endfor %}

@@ -25,41 +25,97 @@ def connect_db():
 
     conn = sqlite3.connect('database.db')
 
+    conn.execute("PRAGMA foreign_keys = ON")
+
     conn.row_factory = sqlite3.Row
 
     return conn
 
+
 def create_tables():
+
     conn = connect_db()
+
+    # admin table
+    conn.execute("""
+
+    CREATE TABLE IF NOT EXISTS admin (
+
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        username TEXT NOT NULL UNIQUE,
+
+        password TEXT NOT NULL
+
+    )
+
+    """)
 
     # students table
     conn.execute("""
-    CREATE TABLE IF NOT EXISTS students(
+
+    CREATE TABLE IF NOT EXISTS students (
+
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        room TEXT,
-        hostel TEXT,
-        received_amount INTEGER DEFAULT 0,
-        remaining_amount INTEGER DEFAULT 30000
+
+        admin_id INTEGER NOT NULL,
+
+        student_code TEXT NOT NULL UNIQUE,
+
+        name TEXT NOT NULL,
+
+        mobile TEXT NOT NULL,
+
+        hostel TEXT NOT NULL,
+
+        room TEXT NOT NULL,
+
+        department TEXT NOT NULL,
+
+        academic_level TEXT NOT NULL,
+
+        total_fees INTEGER NOT NULL DEFAULT 30000,
+
+        received_amount INTEGER NOT NULL DEFAULT 0,
+
+        joining_date TEXT NOT NULL,
+
+        FOREIGN KEY (admin_id) REFERENCES admin(id),
+
+        UNIQUE(admin_id, mobile),
+
+        CHECK(received_amount >= 0),
+
+        CHECK(total_fees >= 0),
+
+        CHECK(received_amount <= total_fees)
+
     )
+
     """)
 
-    # admin table
-
+    # payments table
     conn.execute("""
 
-    CREATE TABLE IF NOT EXISTS admin(
+    CREATE TABLE IF NOT EXISTS payments (
 
         id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-        username TEXT UNIQUE,
+        student_id INTEGER NOT NULL,
 
-        password TEXT
+        amount INTEGER NOT NULL,
+
+        payment_date TEXT NOT NULL,
+
+        FOREIGN KEY (student_id)
+        REFERENCES students(id)
+        ON DELETE CASCADE,
+
+        CHECK(amount > 0)
 
     )
 
     """)
-
     # default admin
 
     admin = conn.execute(
@@ -73,75 +129,29 @@ def create_tables():
 
     if not admin:
 
-        conn.execute(
-
-            "INSERT INTO admin (username, password) VALUES (?, ?)",
-
-            ('admin', 'admin123')
-
-        )
-
-    # payments table
-    conn.execute("""
-    CREATE TABLE IF NOT EXISTS payments(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        student_id INTEGER,
-        amount INTEGER,
-        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
-
-
-    # add admin_id column
-
-    try:
+        hashed_password = generate_password_hash("admin123")
 
         conn.execute(
 
-            "ALTER TABLE students ADD COLUMN admin_id INTEGER"
+            """
+
+            INSERT INTO admin (username, password)
+
+            VALUES (?, ?)
+
+            """,
+
+            ('admin', hashed_password)
 
         )
 
-    except:
 
-        pass
-
-    
-    # add joining_date column if not exists
-    try:
-        conn.execute(
-            "ALTER TABLE students ADD COLUMN joining_date TEXT"
-        )
-    except:
-        pass
-
-    # add department column
-    try:
-        conn.execute(
-            "ALTER TABLE students ADD COLUMN department TEXT"
-        )
-    except:
-        pass
-
-    # add mobile column
-    try:
-        conn.execute(
-            "ALTER TABLE students ADD COLUMN mobile TEXT"
-        )
-    except:
-        pass
-
-    # add academic_level column
-    try:
-        conn.execute(
-            "ALTER TABLE students ADD COLUMN academic_level TEXT"
-        )
-    except:
-        pass
 
     conn.commit()
+
     conn.close()
 
+    
 create_tables()
 
 
@@ -357,9 +367,19 @@ def home():
     ).fetchone()[0]
 
     total_pending = conn.execute(
-        "SELECT SUM(remaining_amount) FROM students WHERE admin_id = ?"
-    ,
-    (admin_id,)
+
+        """
+
+        SELECT SUM(total_fees - received_amount)
+
+        FROM students
+
+        WHERE admin_id = ?
+
+        """,
+
+        (admin_id,)
+
     ).fetchone()[0]
 
     pending_students = conn.execute(
@@ -372,7 +392,7 @@ def home():
 
         WHERE admin_id = ?
 
-        AND remaining_amount > 0
+        AND (total_fees - received_amount) > 0
 
         """,
 
@@ -389,7 +409,7 @@ def home():
 
             payments.amount,
 
-            payments.date
+            payments.payment_date
 
         FROM payments
 
@@ -571,11 +591,23 @@ def student_list():
 @app.route('/payment_page')
 @login_required
 def payment_page():
-    conn = connect_db()
-
+    conn = connect_db() 
     students = conn.execute(
-        "SELECT id, name, remaining_amount FROM students"
+
+        """
+
+        SELECT
+            id,
+            name,
+            (total_fees - received_amount) AS remaining_amount
+
+        FROM students
+
+        """
+
     ).fetchall()
+
+
 
     conn.close()
 
@@ -596,25 +628,121 @@ def add_student():
         admin_id = session['admin_id']
 
         conn = connect_db()
-        joining_date = datetime.now().strftime("%d-%m-%Y")
-        conn.execute(
+
+        student_count = conn.execute(
+
             """
+
+            SELECT COUNT(*)
+
+            FROM students
+
+            WHERE admin_id = ?
+
+            """,
+
+            (admin_id,)
+
+        ).fetchone()[0]
+
+
+        student_code = f"MM{student_count + 1:03}"
+        total_fees = 30000
+
+        
+
+        
+        joining_date = datetime.now().strftime("%d-%m-%Y")
+        
+        existing_student = conn.execute(
+
+            """
+
+            SELECT *
+
+            FROM students
+
+            WHERE mobile = ?
+
+            AND admin_id = ?
+
+            """,
+
+            (mobile, admin_id)
+
+        ).fetchone()
+
+
+        if existing_student:
+
+            conn.close()
+
+            flash("Student with this mobile already exists")
+
+            return redirect('/add_student')
+        
+        conn.execute(
+
+            """
+
             INSERT INTO students
             (
-                name,
-                room,
-                hostel,
-                department,
-                mobile,
-                academic_level,
-                joining_date,
-                admin_id
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ? ,?)
-            """,
-            (name, room, hostel, department, mobile, academic_level, joining_date, admin_id)
-        )
 
+                admin_id,
+
+                student_code,
+
+                name,
+
+                mobile,
+
+                hostel,
+
+                room,
+
+                department,
+
+                academic_level,
+
+                total_fees,
+
+                received_amount,
+
+                joining_date
+
+            )
+
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+            """,
+
+            (
+
+                admin_id,
+
+                student_code,
+
+                name,
+
+                mobile,
+
+                hostel,
+
+                room,
+
+                department,
+
+                academic_level,
+
+                total_fees,
+
+                0,
+
+                joining_date
+
+            )
+
+        )
         conn.commit()
         conn.close()
 
@@ -662,12 +790,6 @@ def delete_student(student_id):
         (student_id,)
     )
 
-    # delete student
-    conn.execute(
-        "DELETE FROM students WHERE id=?",
-        (student_id,)
-    )
-
     conn.commit()
 
     conn.close()
@@ -710,7 +832,7 @@ def payment_history(student_id):
         return redirect('/student_list')
 
     history = conn.execute(
-        "SELECT amount, date FROM payments WHERE student_id = ? ORDER BY date DESC",
+        "SELECT amount, payment_date FROM payments WHERE student_id = ? ORDER BY payment_date DESC",
         (student_id,)
     ).fetchall()
 
@@ -749,10 +871,9 @@ def receive_payment():
 
         """
 
-        SELECT received_amount,
-
-            remaining_amount
-
+        SELECT
+            received_amount,
+            total_fees
         FROM students
 
         WHERE id = ?
@@ -775,7 +896,7 @@ def receive_payment():
 
     current_received = student[0]
 
-    current_remaining = student[1]
+    current_remaining = student['total_fees'] - student['received_amount']
 
 
     # Prevent overpayment
@@ -793,7 +914,7 @@ def receive_payment():
 
     new_received = current_received + amount
 
-    new_remaining = current_remaining - amount
+    
 
 
     # Update student table
@@ -804,9 +925,7 @@ def receive_payment():
 
         UPDATE students
 
-        SET received_amount = ?,
-
-            remaining_amount = ?
+        SET received_amount = ?
 
         WHERE id = ?
         
@@ -814,26 +933,34 @@ def receive_payment():
 
         """,
 
-        (new_received, new_remaining, student_id, admin_id)
+        (new_received, student_id, admin_id)
 
     )
 
 
     # Store payment history
+    payment_date = datetime.now().strftime("%d-%m-%Y %H:%M")
+
 
     conn.execute(
 
         """
 
-        INSERT INTO payments (student_id, amount)
+        INSERT INTO payments
+        (
+            student_id,
+            amount,
+            payment_date
+        )
 
-        VALUES (?, ?)
+        VALUES (?, ?, ?)
 
         """,
 
-        (student_id, amount)
+        (student_id, amount, payment_date)
 
     )
+
 
 
     conn.commit()
@@ -978,7 +1105,7 @@ def update_student():
         mobile=?,
         department=?,
         academic_level=?
-        admin_id=?
+        
 
         WHERE id=?
         AND admin_id=?
@@ -991,7 +1118,9 @@ def update_student():
             mobile,
             department,
             academic_level,
+            admin_id,
             student_id
+            
         )
     )
 
@@ -1038,9 +1167,24 @@ def student_profile(student_id):
         return redirect('/student_list')
 
     payments = conn.execute(
-        "SELECT amount, date FROM payments WHERE student_id = ? ORDER BY date DESC",
-        (student_id,)
-    ).fetchall()
+
+    """
+
+    SELECT
+        amount,
+        payment_date
+
+    FROM payments
+
+    WHERE student_id = ?
+
+    ORDER BY payment_date DESC
+
+    """,
+
+    (student_id,)
+
+).fetchall()
 
     conn.close()
 
@@ -1092,9 +1236,9 @@ def pending_payments():
 
             WHERE admin_id = ?
 
-            AND remaining_amount BETWEEN 0 AND 5000
+            AND (total_fees - received_amount) BETWEEN 0 AND 5000
 
-            ORDER BY remaining_amount ASC
+            ORDER BY (total_fees - received_amount) ASC
 
             """,
 
@@ -1115,9 +1259,9 @@ def pending_payments():
 
             WHERE admin_id = ?
 
-            AND remaining_amount BETWEEN 5000 AND 15000
+            AND (total_fees - received_amount) BETWEEN 5000 AND 15000
 
-            ORDER BY remaining_amount DESC
+            ORDER BY (total_fees - received_amount) DESC
 
             """,
 
@@ -1138,9 +1282,9 @@ def pending_payments():
 
             WHERE admin_id = ?
 
-            AND remaining_amount > 15000
+            AND (total_fees - received_amount) > 15000
 
-            ORDER BY remaining_amount DESC
+            ORDER BY (total_fees - received_amount) DESC
 
             """,
 
@@ -1161,9 +1305,9 @@ def pending_payments():
 
             WHERE admin_id = ?
 
-            AND remaining_amount > 0
+            AND (total_fees - received_amount) > 0
 
-            ORDER BY remaining_amount DESC
+            ORDER BY (total_fees - received_amount) DESC
 
             """,
 
@@ -1190,15 +1334,18 @@ def download_pending_pdf():
 
         """
 
-        SELECT name, hostel, remaining_amount
+       SELECT
+            name,
+            hostel,
+            (total_fees - received_amount) AS remaining_amount
 
         FROM students
 
         WHERE admin_id = ?
 
-        AND remaining_amount > 0
+        AND (total_fees - received_amount) > 0
 
-        ORDER BY remaining_amount DESC
+        ORDER BY (total_fees - received_amount) DESC
 
         """,
 
@@ -1297,13 +1444,11 @@ def download_students_pdf():
 
         """
 
-        SELECT name,
-
+        SELECT
+            name,
             hostel,
-
             room,
-
-            remaining_amount
+            (total_fees - received_amount) AS remaining_amount
 
         FROM students
 

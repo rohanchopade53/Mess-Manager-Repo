@@ -31,6 +31,24 @@
 
     <div class="container">
 
+        {% with messages = get_flashed_messages() %}
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="success-message">
+
+                {{ message }}
+
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+{% endwith %}
+
         <h2 class="page-title" style="display: flex; justify-content: center;">Pending Payments</h2>
         <form method="GET" class="filter-form">
 
@@ -85,15 +103,15 @@
 
                     <tr>
 
-                        <td>{{ student[1] }}</td>
+                        <td>{{ student['name'] }}</td>
 
-                        <td>{{ student[3] }}</td>
+                        <td>{{ student['hostel'] }}</td>
 
-                        <td>₹{{ student[5] }}</td>
+                        <td>₹{{ student['total_fees'] - student['received_amount'] }}</td>
 
                         <td>
 
-                            {% if student[4] == 0 %}
+                            {% if student['received_amount'] == 0 %}
 
                             <span style="color:red; font-weight:bold;">
                                 Unpaid
