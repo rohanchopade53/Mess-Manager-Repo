@@ -17,7 +17,6 @@ from functools import wraps
 import re
 
 
-
 app = Flask(__name__)
 app.secret_key = 'messmanagersecretkey'
 
@@ -161,7 +160,7 @@ def login_required(func):
 
     def wrapper(*args, **kwargs):
 
-        if 'admin_logged_in' not in session:
+        if not session.get('admin_logged_in'):
 
             return redirect('/login')
 
@@ -339,12 +338,11 @@ def signup():
 @app.route('/logout')
 def logout():
 
-    session.pop('admin_logged_in', None)
+    session.clear()
 
     flash('Logged out successfully!')
 
     return redirect('/login')
-
 
 @app.route('/')
 @login_required
@@ -624,6 +622,13 @@ def add_student():
         hostel = request.form['hostel'].strip()
         department = request.form['department'].strip()
         mobile = request.form['mobile'].strip()
+
+        if not mobile.isdigit() or len(mobile) != 10:
+
+            flash("Mobile number must be exactly 10 digits")
+
+            return redirect(request.url)
+        
         academic_level = request.form['academic_level'].strip()
         admin_id = session['admin_id']
 
@@ -753,8 +758,7 @@ def add_student():
     return render_template('add_student.html')
 
 
-@app.route('/delete_student/<int:student_id>')
-def delete_student(student_id):
+
     conn = connect_db()
     admin_id = session['admin_id']
 
@@ -789,6 +793,11 @@ def delete_student(student_id):
         "DELETE FROM payments WHERE student_id=?",
         (student_id,)
     )
+
+    conn.execute(
+    "DELETE FROM students WHERE id=? AND admin_id=?",
+    (student_id, admin_id)
+)
 
     conn.commit()
 
@@ -1035,7 +1044,7 @@ def update_student():
 
         FROM students
 
-        WHERE id = ?
+        WHERE student_id = ?
 
         AND admin_id = ?
 
@@ -1076,7 +1085,7 @@ def update_student():
 
         WHERE mobile = ?
 
-        AND id != ?
+        AND student_id != ?
 
         AND admin_id = ?
 
@@ -1105,8 +1114,6 @@ def update_student():
         mobile=?,
         department=?,
         academic_level=?
-        
-
         WHERE id=?
         AND admin_id=?
         """,
@@ -1120,7 +1127,6 @@ def update_student():
             academic_level,
             admin_id,
             student_id
-            
         )
     )
 
@@ -1198,22 +1204,48 @@ def student_profile(student_id):
 @app.route('/receive_payment_page/<int:student_id>')
 @login_required
 def receive_payment_page(student_id):
- 
 
     conn = connect_db()
 
+    admin_id = session['admin_id']
+
     student = conn.execute(
-        "SELECT * FROM students WHERE id=?",
-        (student_id,)
+
+        """
+
+        SELECT *
+
+        FROM students
+
+        WHERE id = ?
+
+        AND admin_id = ?
+
+        """,
+
+        (student_id, admin_id)
+
     ).fetchone()
+
+
+    if not student:
+
+        conn.close()
+
+        flash("Unauthorized access")
+
+        return redirect('/student_list')
+
 
     conn.close()
 
     return render_template(
-        "receive_payment.html",
-        student=student
-    )
 
+        "receive_payment.html",
+
+        student=student
+
+    )
 
 @app.route("/pending_payments")
 @login_required

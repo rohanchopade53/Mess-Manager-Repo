@@ -1,158 +1,90 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-  <title>Add Student</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block title %}
+Dashboard
+{% endblock %}
 
-<body>
-  <div class="topbar">
-
-    <div class="logo">
-      Mess Management
-    </div>
-
-    <div class="nav-links">
-
-      <a href="/">Dashboard</a>
-
-      <a href="/student_list">Students</a>
-
-      <a href="/pending_payments">Pending</a>
-
-    </div>
-
-  </div>
-
-  <div class="container">
-
-    {% with messages = get_flashed_messages() %}
-
-    {% if messages %}
-
-        {% for message in messages %}
-
-            <div class="success-message">
-
-                {{ message }}
-
-            </div>
-
-        {% endfor %}
-
-    {% endif %}
-
-{% endwith %}
+{% block content %}
 
 
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul>
-      {% for message in messages %}
-      <li style="color: green;">{{ message }}</li>
-      {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
+<div class="container">
 
-    <div class="student-form-card">
+  <div class="student-form-card ui-card">
 
-      <h2>Add New Student</h2>
+    <h1 class="page-title">
+      Add New Student
 
-      <form method="POST">
+      <div class="form-card">
 
-        <label>Student Name</label>
-        <input type="text" name="name" required>
+        <form method="POST">
 
-        <label>Room Number</label>
-        <input type="text" name="room" required>
+          <label class="form-label">Student Name</label>
+          <input type="text" class="form-input" name="name" required>
 
-        <label>Hostel</label>
-        <select name="hostel" required>
+          <label class="form-label">Room Number</label>
+          <input type="text" class="form-input" name="room" required>
 
-          <option value="">Select Hostel</option>
+          <label class="form-label">Hostel</label>
+          <select class="form-select" name="hostel" required>
 
-          <option>Shivneri</option>
-          <option>Raigad</option>
-          <option>Rajgad</option>
+            <option value="">Select Hostel</option>
 
-        </select>
+            <option>Shivneri</option>
+            <option>Raigad</option>
+            <option>Rajgad</option>
 
-        <label>Department</label>
+          </select>
 
-        <select name="department" required>
+          <label class="form-label">Department</label>
 
-          <option value="">Select Department</option>
+          <select class="form-group" name="department" required>
 
-          <option value="Engineering">
-            Engineering
-          </option>
+            <option value="">Select Department</option>
 
-          <option value="Diploma">
-            Diploma
-          </option>
+            <option value="Engineering">
+              Engineering
+            </option>
 
-          <option value="Pharmacy">
-            Pharmacy
-          </option>
+            <option value="Diploma">
+              Diploma
+            </option>
 
-          <option value="School">
-            School
-          </option>
+            <option value="Pharmacy">
+              Pharmacy
+            </option>
 
-        </select>
+            <option value="School">
+              School
+            </option>
 
-        <label>Mobile Number</label>
-        <input type="text" name="mobile">
+          </select>
 
-        <label>Academic Level</label>
-        <input type="text" name="academic_level" placeholder="dept-year">
-     
-        <br><br>
+          <label class="form-label">Mobile Number</label>
+          <input
+    type="tel"
+    name="mobile"
+    class="form-input"
+    maxlength="10"
+    pattern="[0-9]{10}"
+    inputmode="numeric"
+    placeholder="Enter 10-digit mobile number"
+    required
+>
 
-        <button type="submit" class="submit-btn">
-          Add Student
-        </button>
+          <label class="form-label">Academic Level</label>
+          <input type="text" class="form-input" name="academic_level" placeholder="dept-year">
 
-      </form>
+          <br><br>
 
-    </div>
+          <button type="submit" class="submit-btn primary-btn">
+            Add Student
+          </button>
 
-    <br><br>
+        </form>
 
+      </div>
 
   </div>
+</div>
 
-  <footer class="app-footer">
-
-    <div class="footer-inner">
-
-        <h2>Mess Management</h2>
-
-        <p>
-
-            Simplifying hostel and mess operations with
-            organized student records and payment tracking.
-
-        </p>
-
-        <span>
-
-            Built with Flask • SQLite • Modern Dashboard UI
-
-        </span>
-
-        <div class="footer-copy">
-
-            © 2026 Mess Management System
-
-        </div>
-
-    </div>
-
-</footer>
-
-</body>
-
-</html>
+{% endblock %}

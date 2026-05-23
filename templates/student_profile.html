@@ -1,226 +1,225 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Student Profile</title>
+{% block title %}
+Student Profile
+{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block content %}
+<div class="container">
 
-<body>
+    <!-- Summary Cards -->
 
-    <div class="topbar">
+    <div class="profile-summary">
 
-        <div class="logo">
-            Mess Management
-        </div>
+        <div class="summary-card ui-card">
 
-        <div class="nav-links">
+            <h3>Total Fee</h3>
 
-            <a href="/">Dashboard</a>
-
-            <a href="/student_list">Students</a>
-
-            <a href="/pending_payments">Pending</a>
+            <p>
+                ₹{{ student['total_fees'] }}
+            </p>
 
         </div>
 
-    </div>
+
+        <div class="summary-card ui-card">
+
+            <h3>Paid</h3>
+
+            <p>
+                ₹{{ student['received_amount'] }}
+            </p>
+
+        </div>
 
 
+        <div class="summary-card ui-card">
 
-    <div class="container">
+            <h3>Remaining</h3>
 
+            <p>
+                ₹{{ student['total_fees'] - student['received_amount'] }}
+            </p>
 
-        {% with messages = get_flashed_messages() %}
-
-    {% if messages %}
-
-        {% for message in messages %}
-
-            <div class="success-message">
-
-                {{ message }}
-
-            </div>
-
-        {% endfor %}
-
-    {% endif %}
-
-{% endwith %}
-
-        <div class="profile-header">
-            <div class="profile-summary">
-
-    <div class="summary-card">
-
-        <h3>Total Fee</h3>
-
-        <p>₹30000</p>
+        </div>
 
     </div>
 
-    <div class="summary-card">
 
-        <h3>Paid</h3>
+    <!-- Profile Hero -->
 
-        <p>₹{{ student['received_amount'] }}</p>
+    <div class="profile-header">
+
+        <div class="profile-avatar">
+
+            {{ student['name'][0] }}
+
+        </div>
+
+
+        <div class="profile-info">
+
+            <h1 class="profile-name">
+
+                {{ student['name'] }}
+
+            </h1>
+
+
+            <p class="profile-subtitle">
+
+                {{ student['hostel'] }}
+                Hostel • Room
+                {{ student['room'] }}
+
+            </p>
+
+        </div>
+
+
+        <div class="profile-buttons">
+
+            <a
+                href="/edit_student/{{ student['id'] }}"
+                class="secondary-btn edit-profile-btn"
+            >
+                Edit Student
+            </a>
+
+
+            <a
+                href="/receive_payment_page/{{ student['id'] }}"
+                class="primary-btn"
+            >
+                Receive Payment
+            </a>
+
+
+            <a
+                href="/delete_student/{{ student['id'] }}"
+                class="danger-btn"
+                onclick="return confirm('Are you sure you want to delete this student?')"
+            >
+                Delete
+            </a>
+
+        </div>
 
     </div>
 
-    <div class="summary-card">
 
-        <h3>Remaining</h3>
+    <!-- Student Details -->
 
-        <p>₹{{ student['total_fees'] - student['received_amount']}}</p>
+    <div class="payment-card ui-card">
+
+        <div class="profile-details">
+
+            <p>
+                <b>Department:</b>
+                {{ student['department'] }}
+            </p>
+
+            <p>
+                <b>Mobile:</b>
+                {{ student['mobile'] }}
+            </p>
+
+            <p>
+                <b>Academic Level:</b>
+                {{ student['academic_level'] }}
+            </p>
+
+            <p>
+                <b>Hostel:</b>
+                {{ student['hostel'] }}
+            </p>
+
+            <p>
+                <b>Room:</b>
+                {{ student['room'] }}
+            </p>
+
+            <p>
+                <b>Joining Date:</b>
+                {{ student['joining_date'] }}
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Payment History -->
+
+    <div class="payment-history-section">
+
+        <h2 class="section-title">
+
+            Payment History
+
+        </h2>
+
+
+        {% if payments %}
+
+        <div class="table-container ui-card">
+
+            <table class="students-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Amount</th>
+
+                        <th>Date</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for payment in payments %}
+
+                    <tr>
+
+                        <td>
+                            ₹{{ payment['amount'] }}
+                        </td>
+
+                        <td>
+                            {{ payment['payment_date'] }}
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="ui-card no-history-card">
+
+            <p class="empty-text">
+
+                No payment history available
+
+            </p>
+
+        </div>
+
+        {% endif %}
 
     </div>
 
 </div>
-            <div class="profile-avatar">
-
-                {{ student['name']['id'] }}
-
-            </div>
-
-            <div class="profile-info">
-
-                <h1 class="profile-name">
-                    {{ student['name'] }}
-                </h1>
-
-                <p class="profile-subtitle">
-
-                    {{ student['hostel'] }} Hostel • Room {{ student['room'] }}
-
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="profile-buttons">
-
-            <a href="/edit_student/{{ student['id'] }}">
-                <button class="edit-btn">
-                    Edit Student
-                </button>
-            </a>
-
-            <a href="/receive_payment_page/{{ student['id'] }}">
-                <button class="payment-btn">
-                    Receive Payment
-                </button>
-            </a>
-
-            <a href="/delete_student/{{ student['id'] }}"
-                onclick="return confirm('Are you sure you want to delete this student?')">
-
-                <button class="delete-btn">
-                    Delete Student
-                </button>
-
-            </a>
-
-            <a href="/student_list">
-                <button class="back-btn">
-                    Back
-                </button>
-            </a>
-
-        </div>
-
-        <div class="payment-card">
 
 
-
-            <p><b>Department:</b> {{ student['department'] }}</p>
-
-            <p><b>Mobile:</b> {{ student['mobile'] }}</p>
-
-            <p><b>Academic Level:</b> {{ student['academic_level'] }}</p>
-
-            <p><b>Hostel:</b> {{ student['hostel'] }}</p>
-
-            <p><b>Room:</b> {{ student['room'] }}</p>
-
-            <p><b>Joining Date:</b> {{ student['joining_date'] }}</p>
-
-            <hr>
-
-            <p><b>Received Amount:</b> ₹{{ student['received_amount'] }}</p>
-
-            <p><b>Remaining Amount:</b> ₹{{ student ['total_fees'] - student['received_amount'] }}</p>
-
-        </div>
-
-        <br>
-
-        <h3>Payment History</h3>
-
-        {% if payments %}
-
-        <table>
-
-            <tr>
-                <th>Amount</th>
-                <th>Date</th>
-            </tr>
-
-            {% for payment in payments %}
-
-            <tr>
-                <td>₹{{ payment['id'] }}</td>
-                <td>{{ payment['name'] }}</td>
-            </tr>
-
-            {% endfor %}
-
-        </table>
-
-        {% else %}
-
-        <p style="color: gray; font-style: italic;">
-            No payment history available
-        </p>
-
-        {% endif %}
-
-        <br>
-
-
-    </div>
-
-    <footer class="app-footer">
-
-    <div class="footer-inner">
-
-        <h2>Mess Management</h2>
-
-        <p>
-
-            Simplifying hostel and mess operations with
-            organized student records and payment tracking.
-
-        </p>
-
-        <span>
-
-            Built with Flask • SQLite • Modern Dashboard UI
-
-        </span>
-
-        <div class="footer-copy">
-
-            © 2026 Mess Management System
-
-        </div>
-
-    </div>
-
-</footer>
-
-</body>
-
-</html>
+{% endblock %}

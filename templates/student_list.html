@@ -1,295 +1,208 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Student List</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block title %}
+Students
+{% endblock %}
 
-<body>
-    <div class="topbar">
+{% block content %}
 
-        <div class="logo">
-            Mess Management
-        </div>
+<div class="container">
 
-        <div class="nav-links">
+    <div class="page-header">
 
-            <a href="/">Dashboard</a>
+        <div>
 
-            <a href="/student_list">Students</a>
+            <h1 class="page-title">
+                Students Directory
+            </h1>
 
-            <a href="/pending_payments">Pending</a>
+            <p class="page-subtitle">
+                Manage and search all registered students
+            </p>
 
         </div>
 
     </div>
 
 
-
-    <div class="container">
-
-        <div class="page-header">
-
-            <div>
-
-                <h1 class="page-title">
-                    Students Directory
-                </h1>
-
-                <p class="page-subtitle">
-                    Manage and search all registered students
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="toolbar">
-
-        </div>
-
-        <br><br>
-
-
-        <div class="search-panel">
-
-            <form method="GET" class="search-form">
-
-
-                <input type="text" name="search" placeholder="Search by name, room or mobile"
-                    value="{{ request.args.get('search', '') }}">
-
-
-                <button type="submit">
-                    Search
-                </button>
-
-
-
-                <select name="hostel" onchange="this.form.submit()">
-
-                    <option value="">
-                        All Hostels
-                    </option>
-
-                    <option value="Shivneri" {% if hostel=="Shivneri" %}selected{% endif %}>
-
-                        Shivneri
-
-                    </option>
-
-                    <option value="Rajgad" {% if hostel=="Rajgad" %}selected{% endif %}>
-
-                        Rajgad
-
-                    </option>
-
-                    <option value="Raigad" {% if hostel=="Raigad" %}selected{% endif %}>
-
-                        Raigad
-
-                    </option>
-
-                </select>
-
-            </form>
-
-
-
-
-        </div>
-
-        <br><br>
-
-
-
-        {% with messages = get_flashed_messages() %}
-
-        {% if messages %}
-
-        {% for message in messages %}
-
-        <div class="success-message">
-            {{ message }}
-        </div>
-
-        {% endfor %}
-
-        {% endif %}
-
-        {% endwith %}
-
-
-        <div class="export-button">
-            <a href="/download_students_pdf">
-                <button>Download PDF</button>
-            </a>
-
-        </div>
-
-        <div class="table-panel">
-
-
-
-            <div class="table-container">
-
-                <table id="studentTable" class="students-table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>Name</th>
-                            <th>Hostel</th>
-                            <th>Room</th>
-                            <th>Remaining</th>
-                            <th>Status</th>
-                            <th>Profile</th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        {% for student in students %}
-
-                        <tr>
-
-                            <td>{{ student['name'] }}</td>
-
-                            <td>{{ student['hostel'] }}</td>
-
-                            <td>{{ student['room'] }}</td>
-
-                            <td>₹{{ student['total_fees'] - student['received_amount'] }}</td>
-
-                            <td>
-
-                                {% if student['total_fees'] - student['received_amount'] == 0 %}
-
-                                <span style="color: green; font-weight: bold;">
-                                    Paid
-                                </span>
-
-                                {% elif student['received_amount'] == 0 %}
-
-                                <span style="color: red; font-weight: bold;">
-                                    Pending
-                                </span>
-
-                                {% else %}
-
-                                <span style="color: orange; font-weight: bold;">
-                                    Partial
-                                </span>
-
-                                {% endif %}
-
-                            </td>
-
-                            <td>
-
-                                <a href="/student_profile/{{ student[0] }}" class="table-action-btn">
-
-                                    View Profile
-
-                                </a>
-
-                            </td>
-
-                        </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-            </div>
-
-        </div>
-
-        <br><br>
-
-
-
-
+    <div class="search-panel ui-card">
+
+        <form method="GET" class="search-form">
+
+            <input
+                type="text"
+                name="search"
+                class="form-input"
+                placeholder="Search by name, room or mobile"
+                value="{{ request.args.get('search', '') }}"
+            >
+
+
+            <button
+                type="submit"
+                class="primary-btn"
+            >
+                Search
+            </button>
+
+
+            <select
+                name="hostel"
+                class="form-select"
+                onchange="this.form.submit()"
+            >
+
+                <option value="">
+                    All Hostels
+                </option>
+
+                <option value="Shivneri"
+                {% if hostel == "Shivneri" %}
+                selected
+                {% endif %}>
+                    Shivneri
+                </option>
+
+                <option value="Rajgad"
+                {% if hostel == "Rajgad" %}
+                selected
+                {% endif %}>
+                    Rajgad
+                </option>
+
+                <option value="Raigad"
+                {% if hostel == "Raigad" %}
+                selected
+                {% endif %}>
+                    Raigad
+                </option>
+
+            </select>
+
+        </form>
 
     </div>
-    <script>
 
-        function searchStudent() {
 
-            let input =
-                document.getElementById("searchInput")
-                    .value
-                    .toLowerCase();
+    <div class="export-button">
 
-            let table =
-                document.getElementById("studentTable");
+        <a
+            href="/download_students_pdf"
+            class="primary-btn"
+        >
+            Download PDF
+        </a>
 
-            let rows =
-                table.getElementsByTagName("tr");
+    </div>
 
-            for (let i = 1; i < rows.length; i++) {
 
-                let firstColumn =
-                    rows[i].getElementsByTagName("td")[0];
+    <div class="table-panel">
 
-                if (firstColumn) {
+        <div class="table-container ui-card">
 
-                    let text =
-                        firstColumn.textContent.toLowerCase();
+            <table
+                id="studentTable"
+                class="students-table"
+            >
 
-                    if (text.includes(input)) {
+                <thead>
 
-                        rows[i].style.display = "";
+                    <tr>
 
-                    } else {
+                        <th>Name</th>
 
-                        rows[i].style.display = "none";
-                    }
-                }
-            }
-        }
+                        <th>Hostel</th>
 
-    </script>
+                        <th>Room</th>
 
-    <a href="/add_student" class="floating-add-btn">
+                        <th>Remaining</th>
 
-        ✦ Add Student
+                        <th>Status</th>
 
-    </a>
+                        <th>Profile</th>
 
-    <footer class="app-footer">
+                    </tr>
 
-    <div class="footer-inner">
+                </thead>
 
-        <h2>Mess Management</h2>
 
-        <p>
+                <tbody>
 
-            Simplifying hostel and mess operations with
-            organized student records and payment tracking.
+                    {% for student in students %}
 
-        </p>
+                    <tr>
 
-        <span>
+                        <td>
+                            {{ student['name'] }}
+                        </td>
 
-            Built with Flask • SQLite • Modern Dashboard UI
+                        <td>
+                            {{ student['hostel'] }}
+                        </td>
 
-        </span>
+                        <td>
+                            {{ student['room'] }}
+                        </td>
 
-        <div class="footer-copy">
+                        <td>
+                            ₹{{ student['total_fees'] - student['received_amount'] }}
+                        </td>
 
-            © 2026 Mess Management System
+                        <td>
+
+                            {% if student['total_fees'] - student['received_amount'] == 0 %}
+
+                            <span class="status-paid">
+                                Paid
+                            </span>
+
+                            {% elif student['received_amount'] == 0 %}
+
+                            <span class="status-pending">
+                                Pending
+                            </span>
+
+                            {% else %}
+
+                            <span class="status-partial">
+                                Partial
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <a
+                                href="/student_profile/{{ student['id'] }}"
+                                class="table-action-btn"
+                            >
+                                View Profile
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
 
         </div>
 
     </div>
 
-</footer>
-</body>
+</div>
 
-</html>
+
+<a
+    href="/add_student"
+    class="floating-add-btn primary-btn"
+>
+    ✦ Add Student
+</a>
+
+{% endblock %}

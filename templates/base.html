@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>{% block title %}Mess Manager{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+    {% if session.get('admin_logged_in') %}
+
+    <div class="topbar">
+
+
+        <div class="logo">
+            Mess Manager
+        </div>
+
+            <div class="nav-links">
+
+    <a href="/"
+       class="{% if request.path == '/' %}active{% endif %}">
+        Dashboard
+    </a>
+
+    <a href="/student_list"
+       class="{% if request.path == '/student_list' %}active{% endif %}">
+        Students
+    </a>
+
+    <a href="/pending_payments"
+       class="{% if request.path == '/pending_payments' %}active{% endif %}">
+        Pending
+    </a>
+
+    <a href="/logout">
+        Logout
+    </a>
+
+</div>
+
+    </div>
+
+    {% endif %}
+
+
+    {% with messages = get_flashed_messages() %}
+
+    {% if messages %}
+
+    <div class="flash-container">
+
+        {% for message in messages %}
+
+        <div class="flash-message">
+
+            {{ message }}
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+    {% endwith %}
+
+    <div class="page-content">
+
+        {% block content %}
+
+        {% endblock %}
+
+    </div>
+
+    <footer class="app-footer">
+
+    <div class="footer-inner">
+
+        <h2>Mess Manager</h2>
+
+        <p>
+
+            Simplifying hostel and mess operations with
+            organized student records and payment tracking.
+
+        </p>
+
+        <span>
+
+            Built with Flask • SQLite • Modern SaaS Dashboard
+
+        </span>
+
+        <div class="footer-copy">
+
+            © 2026 Mess Management System
+
+        </div>
+
+    </div>
+
+</footer>
+
+<script>
+
+document.addEventListener("input", function(event) {
+
+    if (event.target.name === "mobile") {
+
+        event.target.value =
+            event.target.value
+                .replace(/\D/g, "")
+                .slice(0, 10);
+    }
+});
+
+</script>
+
+</body>
+
+</html>

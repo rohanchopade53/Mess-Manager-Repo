@@ -1,167 +1,199 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-<title>Edit Student</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block title %}
+Dashboard
+{% endblock %}
 
-<body>
-   <div class="topbar">
+{% block content %}
 
-    <div class="logo">
-        Mess Management
-    </div>
+<div class="student-form-card ui-card">
 
-    <div class="nav-links">
+    <h1 class="page-title">
+        Edit Student
+    </h1>
 
-        <a href="/">Dashboard</a>
+    <form action="/update_student" method="POST">
 
-        <a href="/student_list">Students</a>
+        <input
+            type="hidden"
+            name="student_id"
+            value="{{ student['id'] }}"
+        >
 
-        <a href="/pending_payments">Pending</a>
+        <div class="form-group">
 
-    </div>
+            <label class="form-label">
+                Name
+            </label>
 
-</div>
-
-
-<div class="container">
-
-<h2>Edit Student</h2>
-
-<form action="/update_student" method="POST">
-
-<input type="hidden"
-name="student_id"
-value="{{ student[0] }}">
-
-Name:
-<input type="text"
-name="name"
-value="{{ student['name'] }}"
-required>
-
-<br><br>
-
-Mobile:
-<input type="text"
-name="mobile"
-value="{{ student['mobile'] }}"
-required>
-
-<br><br>
-
-Department:
-
-<select name="department" required>
-
-<option value="Engineering"
-{% if student['department'] == 'Engineering' %}selected{% endif %}>
-Engineering
-</option>
-
-<option value="Diploma"
-{% if student['department'] == 'Diploma' %}selected{% endif %}>
-Diploma
-</option>
-
-<option value="Pharmacy"
-{% if student['department'] == 'Pharmacy' %}selected{% endif %}>
-Pharmacy
-</option>
-
-<option value="School"
-{% if student['department'] == 'School' %}selected{% endif %}>
-School
-</option>
-
-</select>
-
-<br><br>
-
-Academic Level:
-<input type="text"
-name="academic_level"
-value="{{ student['academic_level'] }}"
-required>
-
-<br><br>
-
-Room:
-<input type="text"
-name="room"
-value="{{ student['room'] }}"
-required>
-
-<br><br>
-
-Hostel:
-
-<select name="hostel">
-
-<option value="Shivneri"
-{% if student['hostel'] == 'Shivneri' %}selected{% endif %}>
-Shivneri
-</option>
-
-<option value="Raigad"
-{% if student['hostel'] == 'Raigad' %}selected{% endif %}>
-Raygad
-</option>
-
-<option value="Rajgad"
-{% if student['hostel'] == 'Rajgad' %}selected{% endif %}>
-Rajgad
-</option>
-
-</select>
-
-<br><br>
-
-<button type="submit">
-Update Student
-</button>
-
-</form>
-
-<br>
-
-<a href="/student_list">
-<button>Back</button>
-</a>
-
-
-
-</div>
-
-<footer class="app-footer">
-
-    <div class="footer-inner">
-
-        <h2>Mess Management</h2>
-
-        <p>
-
-            Simplifying hostel and mess operations with
-            organized student records and payment tracking.
-
-        </p>
-
-        <span>
-
-            Built with Flask • SQLite • Modern Dashboard UI
-
-        </span>
-
-        <div class="footer-copy">
-
-            © 2026 Mess Management System
+            <input
+                type="text"
+                name="name"
+                class="form-input"
+                value="{{ student['name'] }}"
+                required
+            >
 
         </div>
 
-    </div>
 
-</footer>
-</body>
-</html>
+        <div class="form-group">
+
+            <label class="form-label">
+                Mobile
+            </label>
+
+           <input
+    type="tel"
+    name="mobile"
+    class="form-input"
+    maxlength="10"
+    pattern="[0-9]{10}"
+    inputmode="numeric"
+    placeholder="Enter 10-digit mobile number"
+    required
+>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                Department
+            </label>
+
+            <select
+                name="department"
+                class="form-select"
+                required
+            >
+
+                <option value="Engineering"
+                {% if student['department'] == 'Engineering' %}
+                selected
+                {% endif %}>
+                    Engineering
+                </option>
+
+                <option value="Diploma"
+                {% if student['department'] == 'Diploma' %}
+                selected
+                {% endif %}>
+                    Diploma
+                </option>
+
+                <option value="Pharmacy"
+                {% if student['department'] == 'Pharmacy' %}
+                selected
+                {% endif %}>
+                    Pharmacy
+                </option>
+
+                <option value="School"
+                {% if student['department'] == 'School' %}
+                selected
+                {% endif %}>
+                    School
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                Academic Level
+            </label>
+
+            <input
+                type="text"
+                name="academic_level"
+                class="form-input"
+                value="{{ student['academic_level'] }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                Room
+            </label>
+
+            <input
+                type="text"
+                name="room"
+                class="form-input"
+                value="{{ student['room'] }}"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label class="form-label">
+                Hostel
+            </label>
+
+            <select
+                name="hostel"
+                class="form-select"
+            >
+
+                <option value="Shivneri"
+                {% if student['hostel'] == 'Shivneri' %}
+                selected
+                {% endif %}>
+                    Shivneri
+                </option>
+
+                <option value="Raigad"
+                {% if student['hostel'] == 'Raigad' %}
+                selected
+                {% endif %}>
+                    Raigad
+                </option>
+
+                <option value="Rajgad"
+                {% if student['hostel'] == 'Rajgad' %}
+                selected
+                {% endif %}>
+                    Rajgad
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="primary-btn"
+            >
+                Update Student
+            </button>
+
+            <a
+                href="/student_list"
+                class="secondary-btn"
+            >
+                Back
+            </a>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+{% endblock %}

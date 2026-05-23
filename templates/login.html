@@ -1,16 +1,16 @@
-<!DOCTYPE html>
 
-<html>
 
-<head>
+{% extends "base.html" %}
 
-    <title>Login</title>
+{% block title %}
+Dashboard
+{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% block content %}
 
-</head>
 
-<body class="login-page">
+
+<div class="login-page">
 
     <div class="login-container">
 
@@ -21,42 +21,6 @@
             <p>Admin Login</p>
 
 
-            {% with messages = get_flashed_messages() %}
-
-    {% if messages %}
-
-        {% for message in messages %}
-
-            <div class="success-message">
-
-                {{ message }}
-
-            </div>
-
-        {% endfor %}
-
-    {% endif %}
-
-{% endwith %}
-
-
-            {% with messages = get_flashed_messages() %}
-
-            {% if messages %}
-
-            {% for message in messages %}
-
-            <div class="error-message">
-
-                {{ message }}
-
-            </div>
-
-            {% endfor %}
-
-            {% endif %}
-
-            {% endwith %}
 
             
                 <form method="POST">
@@ -86,6 +50,6 @@
 
     </div>
 
-</body>
+</div>
 
-</html>
+{% endblock %}

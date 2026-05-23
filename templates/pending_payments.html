@@ -1,193 +1,157 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Pending Payments</title>
+{% block title %}
+Dashboard
+{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% block content %}
 
-<body>
 
-    <div class="topbar">
 
-        <div class="logo">
-            Mess Management
+
+<div class="container">
+
+    <div class="page-header pending-toolbar">
+
+        <div>
+
+            <h1 class="page-title">
+
+                Pending Payments
+
+            </h1>
+
+            <p class="page-subtitle">
+
+                Track students with incomplete fee payments
+
+            </p>
+
         </div>
 
-        <div class="nav-links">
 
-            <a href="/">Dashboard</a>
+        <div class="toolbar-actions">
 
-            <a href="/student_list">Students</a>
+            <form method="GET" class="filter-form">
 
-            <a href="/pending_payments">Pending</a>
+                <select name="payment_filter" class="form-select">
 
-        </div>
+                    <option value="">
+                        All Pending
+                    </option>
 
-    </div>
+                    <option value="0_5000">
+                        Remaining 0 - 5000
+                    </option>
+
+                    <option value="5000_15000">
+                        Remaining 5000 - 15000
+                    </option>
+
+                    <option value="15000">
+                        Remaining Above 15000
+                    </option>
+
+                </select>
 
 
+                <button type="submit" class="primary-btn">
+                    Filter
+                </button>
 
-    <div class="container">
-
-        {% with messages = get_flashed_messages() %}
-
-    {% if messages %}
-
-        {% for message in messages %}
-
-            <div class="success-message">
-
-                {{ message }}
-
-            </div>
-
-        {% endfor %}
-
-    {% endif %}
-
-{% endwith %}
-
-        <h2 class="page-title" style="display: flex; justify-content: center;">Pending Payments</h2>
-        <form method="GET" class="filter-form">
-
-            <select name="payment_filter">
-
-                <option value="">
-                    All Pending
-                </option>
-
-                <option value="0_5000">
-                    Remaining 0 - 5000
-                </option>
-
-                <option value="5000_15000">
-                    Remaining 5000 - 15000
-                </option>
-
-                <option value="15000">
-                    Remaining Above 15000
-                </option>
-
-            </select>
-
-            <button type="submit">
-                Filter
-            </button>
-
-        </form>
-
-        <div class="export-button">
-            <a href="/download_pending_pdf">
-                <button>Download PDF</button>
+            </form>
+            
+            <a href="/download_pending_pdf" class="primary-btn">
+                Download PDF
             </a>
-        </div>
 
 
-        <div class="table-panel">
-
-            <div class="table-container">
-
-                <table class="students-table">
-
-                    <tr>
-                        <th>Name</th>
-                        <th>Hostel</th>
-                        <th>Remaining</th>
-                        <th>Status</th>
-                        <th>Profile</th>
-                    </tr>
-
-                    {% for student in students %}
-
-                    <tr>
-
-                        <td>{{ student['name'] }}</td>
-
-                        <td>{{ student['hostel'] }}</td>
-
-                        <td>₹{{ student['total_fees'] - student['received_amount'] }}</td>
-
-                        <td>
-
-                            {% if student['received_amount'] == 0 %}
-
-                            <span style="color:red; font-weight:bold;">
-                                Unpaid
-                            </span>
-
-                            {% else %}
-
-                            <span style="color:orange; font-weight:bold;">
-                                Partial
-                            </span>
-
-                            {% endif %}
-
-                        </td>
-
-                        <td>
-
-                            <a href="/student_profile/{{ student[0] }}" class="table-action-btn">
-
-                                View Profile
-
-                            </a>
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </table>
-            </div>
-            <div>
-
-
-
-
-
-
-            </div>
-
-
-
-        </div>
-
-
-    </div>
-
-    <footer class="app-footer">
-
-    <div class="footer-inner">
-
-        <h2>Mess Management</h2>
-
-        <p>
-
-            Simplifying hostel and mess operations with
-            organized student records and payment tracking.
-
-        </p>
-
-        <span>
-
-            Built with Flask • SQLite • Modern Dashboard UI
-
-        </span>
-
-        <div class="footer-copy">
-
-            © 2026 Mess Management System
 
         </div>
 
     </div>
 
-</footer>
 
 
-</body>
 
-</html>
+    <div class="table-panel">
+
+        <div class="table-container" class="table-container ui-card">
+
+            <table class="students-table">
+
+                <tr>
+                    <th>Name</th>
+                    <th>Hostel</th>
+                    <th>Remaining</th>
+                    <th>Status</th>
+                    <th>Profile</th>
+                </tr>
+
+                {% for student in students %}
+
+                <tr>
+
+                    <td>{{ student['name'] }}</td>
+
+                    <td>{{ student['hostel'] }}</td>
+
+                    <td>₹{{ student['total_fees'] - student['received_amount'] }}</td>
+
+                    <td>
+
+                        {% if student['received_amount'] == 0 %}
+
+                        <span style="color:red; font-weight:bold;">
+                            Unpaid
+                        </span>
+
+                        {% else %}
+
+                        <span style="color:orange; font-weight:bold;">
+                            Partial
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <a href="/student_profile/{{ student[0] }}" class="table-action-btn">
+
+                            View Profile
+
+                        </a>
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </table>
+        </div>
+        <div>
+
+
+
+
+
+
+        </div>
+
+
+
+    </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+{% endblock %}

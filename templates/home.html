@@ -1,91 +1,46 @@
-<!DOCTYPE html>
-<html>
 
-<head>
-    <title>Mess Management System</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
+{% extends "base.html" %}
 
-<body class="home-page">
+{% block title %}
+Dashboard
+{% endblock %}
 
-    <div class="topbar">
+{% block content %}
 
-        <div class="logo">
 
-            <div class="logo-title">
-                MESS Management
-            </div>
-
-            <div class="logo-subtitle">
-                Management Dashboard
-            </div>
-
-        </div>
-
-        <div class="nav-links">
-
-            <a href="/">Dashboard</a>
-
-            <a href="/student_list">Students</a>
-
-            <a href="/pending_payments">Pending</a>
-
-            <a href="/logout">Logout</a>
-
-        </div>
-
-    </div>
 
 
     <div class="dashboard-container">
-
-        {% with messages = get_flashed_messages() %}
-
-    {% if messages %}
-
-        {% for message in messages %}
-
-            <div class="success-message">
-
-                {{ message }}
-
-            </div>
-
-        {% endfor %}
-
-    {% endif %}
-
-{% endwith %}
 
         <div class="dashboard-layout">
 
             <!-- Stats Cards -->
 
 
-            <h1 class="dashboard-title">
+            <h1 class="dashboard-title page-title">
                 Dashboard Overview
             </h1>
 
             <div class="dashboard-cards">
 
-                <div class="dashboard-card">
+                <div class="dashboard-card dashboard-card ui-card">
                     <h3>Total Students</h3>
                     <p>{{ total_students }}</p>
                 </div>
 
-                <div class="dashboard-card">
+                <div class="dashboard-card dashboard-card ui-card">
                     <h3>Pending Students</h3>
                     <p>{{ pending_students }}</p>
                 </div>
 
 
-                <div class="dashboard-card">
+                <div class="dashboard-card dashboard-card ui-card">
                     <h3>Total Collected</h3>
                     <p>₹{{ total_collected }}</p>
                 </div>
 
 
-                <div class="dashboard-card">
+                <div class="dashboard-card dashboard-card ui-card">
                     <h3>Total Pending</h3>
                     <p>₹{{ total_pending }}</p>
                 </div>
@@ -96,7 +51,7 @@
 
             </div>
         </div>
-    </div>
+   
 
 
     <!-- Middle Section -->
@@ -106,7 +61,7 @@
 
         <!-- Recent Payments -->
 
-        <div class="recent-payments">
+        <div class="recent-payments ui-card">
 
             <h2>Recent Activity</h2>
 
@@ -119,17 +74,17 @@
                 <div class="payment-left">
 
                     <div class="student-payment-name">
-                        {{ payment[0] }}
+                        {{ payment['name'] }}
                     </div>
 
                     <div class="payment-date">
-                        {{ payment[2] }}
+                        {{ payment['payment_date'] }}
                     </div>
 
                 </div>
 
                 <div class="payment-amount">
-                    ₹{{ payment[1] }}
+                    ₹{{ payment['amount'] }}
                 </div>
 
             </div>
@@ -147,7 +102,7 @@
 
         <!-- Quick Actions -->
 
-        <div class="quick-actions">
+        <div class="quick-actions ui-card">
 
             <h2>Operations</h2>
 
@@ -171,37 +126,9 @@
 
     </div>
 
-    </div>
 
-<footer class="app-footer">
 
-    <div class="footer-inner">
+</div>
 
-        <h2>Mess Management</h2>
 
-        <p>
-
-            Simplifying hostel and mess operations with
-            organized student records and payment tracking.
-
-        </p>
-
-        <span>
-
-            Built with Flask • SQLite • Modern Dashboard UI
-
-        </span>
-
-        <div class="footer-copy">
-
-            © 2026 Mess Management System
-
-        </div>
-
-    </div>
-
-</footer>
-
-</body>
-
-</html>
+{% endblock %}
