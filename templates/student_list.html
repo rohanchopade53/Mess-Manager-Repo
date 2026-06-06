@@ -6,6 +6,10 @@ Students
 
 {% block content %}
 
+
+
+
+
 <div class="container">
 
     <div class="page-header">
@@ -42,10 +46,10 @@ Students
                 type="submit"
                 class="primary-btn"
             >
-                Search
+                🔍 Search students...
             </button>
 
-
+            <div class="filter-buttonss">
             <select
                 name="hostel"
                 class="form-select"
@@ -79,21 +83,25 @@ Students
 
             </select>
 
-        </form>
-
-    </div>
-
-
-    <div class="export-button">
-
+            
         <a
             href="/download_students_pdf"
             class="primary-btn"
         >
-            Download PDF
+                ⬇ Export PDF
         </a>
 
+        </div>
+
+        </form>
+
+
+         
+
     </div>
+
+
+
 
 
     <div class="table-panel">
@@ -191,6 +199,22 @@ Students
 
             </table>
 
+            {% if not students %}
+
+<div class="ui-card no-history-card">
+
+    <p class="empty-text">
+
+        No students found
+
+    </p>
+
+</div>
+
+{% endif %}
+
+            
+
         </div>
 
     </div>
@@ -204,5 +228,6 @@ Students
 >
     ✦ Add Student
 </a>
+
 
 {% endblock %}

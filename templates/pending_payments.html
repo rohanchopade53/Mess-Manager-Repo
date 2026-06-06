@@ -11,138 +11,153 @@ Dashboard
 
 <div class="container">
 
-    <div class="page-header pending-toolbar">
+    <div class="page-header pending-header">
 
-        <div>
+        <h1 class="page-title">
+            Pending Payments
+        </h1>
 
-            <h1 class="page-title">
+        <p class="page-subtitle">
+            Track students with incomplete fee payments
+        </p>
 
-                Pending Payments
+    </div>
+</div>
 
-            </h1>
 
-            <p class="page-subtitle">
+<div class="pending-toolbar">
 
-                Track students with incomplete fee payments
+    <div class="toolbar-actions">
+
+        <form method="GET" class="filter-form">
+
+            <select name="payment_filter" class="form-select">
+
+                <option value="">All Pending</option>
+
+                <option value="1_5000">
+                    Remaining Up to 5000
+                </option>
+
+                <option value="1_15000">
+                    Remaining up to 15000
+                </option>
+
+                <option value="15000">
+                    Remaining Above 15000
+                </option>
+
+            </select>
+
+            <button type="submit" class="primary-btn">
+                Filter
+            </button>
+
+        </form>
+
+        <a href="/download_pending_pdf" class="primary-btn">
+            ⬇ Export PDF
+
+        </a>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="table-panel">
+
+    <div class="table-container ui-card">
+
+        <table class="students-table">
+
+            <tr>
+                <th>Name</th>
+                <th>Hostel</th>
+                <th>Room</th>
+                <th>Remaining</th>
+                <th>Status</th>
+                <th>Profile</th>
+            </tr>
+
+            {% for student in students %}
+
+            <tr>
+
+                <td>{{ student['name'] }}</td>
+                <td>{{ student['hostel'] }}</td>
+                <td>{{ student['room'] }}</td>
+
+                <td>₹{{ student['total_fees'] - student['received_amount'] }}</td>
+
+                <td>
+
+                    {% if student['total_fees'] - student['received_amount'] == 0 %}
+
+                    <span class="status-paid">
+                        Paid
+                    </span>
+
+                    {% elif student['received_amount'] == 0 %}
+
+                    <span class="status-pending">
+                        Pending
+                    </span>
+
+                    {% else %}
+
+                    <span class="status-partial">
+                        Partial
+                    </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    <a href="/student_profile/{{ student[0] }}" class="table-action-btn">
+
+                        View Profile
+
+                    </a>
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+        {% if not students %}
+
+        <div class="ui-card no-history-card">
+
+            <p class="empty-text">
+
+                No pending payments found
 
             </p>
 
         </div>
 
+        {% endif %}
 
-        <div class="toolbar-actions">
-
-            <form method="GET" class="filter-form">
-
-                <select name="payment_filter" class="form-select">
-
-                    <option value="">
-                        All Pending
-                    </option>
-
-                    <option value="0_5000">
-                        Remaining 0 - 5000
-                    </option>
-
-                    <option value="5000_15000">
-                        Remaining 5000 - 15000
-                    </option>
-
-                    <option value="15000">
-                        Remaining Above 15000
-                    </option>
-
-                </select>
-
-
-                <button type="submit" class="primary-btn">
-                    Filter
-                </button>
-
-            </form>
-            
-            <a href="/download_pending_pdf" class="primary-btn">
-                Download PDF
-            </a>
+    </div>
+    <div>
 
 
 
-        </div>
+
+
 
     </div>
 
 
 
-
-    <div class="table-panel">
-
-        <div class="table-container" class="table-container ui-card">
-
-            <table class="students-table">
-
-                <tr>
-                    <th>Name</th>
-                    <th>Hostel</th>
-                    <th>Remaining</th>
-                    <th>Status</th>
-                    <th>Profile</th>
-                </tr>
-
-                {% for student in students %}
-
-                <tr>
-
-                    <td>{{ student['name'] }}</td>
-
-                    <td>{{ student['hostel'] }}</td>
-
-                    <td>₹{{ student['total_fees'] - student['received_amount'] }}</td>
-
-                    <td>
-
-                        {% if student['received_amount'] == 0 %}
-
-                        <span style="color:red; font-weight:bold;">
-                            Unpaid
-                        </span>
-
-                        {% else %}
-
-                        <span style="color:orange; font-weight:bold;">
-                            Partial
-                        </span>
-
-                        {% endif %}
-
-                    </td>
-
-                    <td>
-
-                        <a href="/student_profile/{{ student[0] }}" class="table-action-btn">
-
-                            View Profile
-
-                        </a>
-                    </td>
-
-                </tr>
-
-                {% endfor %}
-
-            </table>
-        </div>
-        <div>
-
-
-
-
-
-
-        </div>
-
-
-
-    </div>
+</div>
 
 
 </div>

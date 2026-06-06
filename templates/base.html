@@ -5,7 +5,7 @@
 
     <title>{% block title %}Mess Manager{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -21,49 +21,42 @@
 
 
         <div class="logo">
-            Mess Manager
+            🍽️ Mess Manager
         </div>
 
-            <div class="nav-links">
+        <div class="nav-links">
 
-    <a href="/"
-       class="{% if request.path == '/' %}active{% endif %}">
-        Dashboard
-    </a>
+            <a href="/" class="{% if request.path == '/' %}active{% endif %}">
+                📊 Dashboard
+            </a>
 
-    <a href="/student_list"
-       class="{% if request.path == '/student_list' %}active{% endif %}">
-        Students
-    </a>
+            <a href="/student_list" class="{% if request.path == '/student_list' %}active{% endif %}">
+               👥Students
+            </a>
 
-    <a href="/pending_payments"
-       class="{% if request.path == '/pending_payments' %}active{% endif %}">
-        Pending
-    </a>
+            <a href="/pending_payments" class="{% if request.path == '/pending_payments' %}active{% endif %}">
+                ⚠️ Pending
+            </a>
 
-    <a href="/logout">
-        Logout
-    </a>
+            <a href="/logout">
+               ⇥ Logout
+            </a>
 
-</div>
+        </div>
 
     </div>
 
     {% endif %}
 
-
-    {% with messages = get_flashed_messages() %}
-
+    {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
 
     <div class="flash-container">
 
-        {% for message in messages %}
+        {% for category, message in messages %}
 
-        <div class="flash-message">
-
+        <div class="flash-message {{ category }}">
             {{ message }}
-
         </div>
 
         {% endfor %}
@@ -71,8 +64,8 @@
     </div>
 
     {% endif %}
-
     {% endwith %}
+
 
     <div class="page-content">
 
@@ -81,50 +74,55 @@
         {% endblock %}
 
     </div>
-
     <footer class="app-footer">
 
-    <div class="footer-inner">
+        © Mess Manager v1.0
+    Built with Flask & SQLite
 
-        <h2>Mess Manager</h2>
+    </footer>
 
-        <p>
 
-            Simplifying hostel and mess operations with
-            organized student records and payment tracking.
+    <script>
 
-        </p>
+        document.addEventListener("input", function (event) {
 
-        <span>
+            if (event.target.name === "mobile") {
 
-            Built with Flask • SQLite • Modern SaaS Dashboard
+                event.target.value =
+                    event.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 10);
+            }
+        });
 
-        </span>
 
-        <div class="footer-copy">
 
-            © 2026 Mess Management System
+        document.querySelectorAll("form").forEach(form => {
 
-        </div>
+            form.addEventListener("submit", () => {
 
-    </div>
+                const button =
+                    form.querySelector("button[type='submit']");
 
-</footer>
+                if (button) {
 
-<script>
+                    button.disabled = true;
 
-document.addEventListener("input", function(event) {
+                    button.innerText = "Processing...";
+                }
+            });
+        });
 
-    if (event.target.name === "mobile") {
 
-        event.target.value =
-            event.target.value
-                .replace(/\D/g, "")
-                .slice(0, 10);
-    }
-});
+        setTimeout(() => {
 
-</script>
+            document.querySelectorAll('.flash-message')
+                .forEach(msg => msg.remove());
+
+        }, 5500);
+
+
+    </script>
 
 </body>
 

@@ -10,17 +10,40 @@ Receive Payment
 
     <div class="payment-card ui-card">
 
+        <div class="page-heading">
+
         <h1 class="page-title">
             Receive Payment
         </h1>
 
+        <p class="form-subtitle">
+            Record a new payment for this student
+        </p>
 
-        <h2 class="payment-student-name">
-            {{ student['name'] }}
-        </h2>
+        </div>
 
 
-        <div class="payment-summary">
+        <div class="payment-student-header">
+
+            <div class="payment-avatar">
+                {{ initials }}
+            </div>
+
+            <div>
+
+                <h2 class="payment-student-name">
+                    {{ student['name'] }}
+                </h2>
+
+                <p class="payment-student-subtitle">
+                    Student Payment Portal
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="payment-summary-card">
 
             <span class="payment-label">
                 Remaining Amount:
@@ -33,16 +56,9 @@ Receive Payment
         </div>
 
 
-        <form
-            action="/receive_payment"
-            method="POST"
-        >
+        <form action="/receive_payment" method="POST">
 
-            <input
-                type="hidden"
-                name="student_id"
-                value="{{ student['id'] }}"
-            >
+            <input type="hidden" name="student_id" value="{{ student['id'] }}">
 
 
             <div class="form-group">
@@ -51,35 +67,24 @@ Receive Payment
                     Enter Amount
                 </label>
 
-                <input
-                    type="number"
-                    name="amount"
-                    class="form-input"
-                    max="{{ student['total_fees'] - student['received_amount'] }}"
-                    required
-                >
+                <input type="number" name="amount" class="form-input"
+                    max="{{ student['total_fees'] - student['received_amount'] }}" required>
 
             </div>
 
 
-            
+            <div class="form-actions">
 
-                <button
-                    type="submit"
-                    class="primary-btn"
-                >
+                <button type="submit" class="primary-btn">
                     Receive Payment
                 </button>
 
 
-                <a
-                    href="/student_profile/{{ student['id'] }}"
-                    class="secondary-btn"
-                >
+                <a href="/student_profile/{{ student['id'] }}" class="secondary-btn">
                     Back to Profile
                 </a>
 
-            
+            </div>
 
         </form>
 

@@ -8,17 +8,14 @@ Dashboard
 
 <div class="student-form-card ui-card">
 
-    <h1 class="page-title">
-        Edit Student
-    </h1>
+    <h1>Edit Student</h1>
+    <p class="form-subtitle">
+        Update student information and hostel details
+    </p>
 
     <form action="/update_student" method="POST">
 
-        <input
-            type="hidden"
-            name="student_id"
-            value="{{ student['id'] }}"
-        >
+        <input type="hidden" name="student_id" value="{{ student['id'] }}">
 
         <div class="form-group">
 
@@ -26,13 +23,7 @@ Dashboard
                 Name
             </label>
 
-            <input
-                type="text"
-                name="name"
-                class="form-input"
-                value="{{ student['name'] }}"
-                required
-            >
+            <input type="text" name="name" class="form-input" value="{{ student['name'] }}" required>
 
         </div>
 
@@ -43,16 +34,8 @@ Dashboard
                 Mobile
             </label>
 
-           <input
-    type="tel"
-    name="mobile"
-    class="form-input"
-    maxlength="10"
-    pattern="[0-9]{10}"
-    inputmode="numeric"
-    placeholder="Enter 10-digit mobile number"
-    required
->
+            <input type="tel" name="mobile" class="form-input" maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+                placeholder="Enter 10-digit mobile number" required>
 
         </div>
 
@@ -63,37 +46,21 @@ Dashboard
                 Department
             </label>
 
-            <select
-                name="department"
-                class="form-select"
-                required
-            >
+            <select name="department" class="form-select" required>
 
-                <option value="Engineering"
-                {% if student['department'] == 'Engineering' %}
-                selected
-                {% endif %}>
+                <option value="Engineering" {% if student['department']=='Engineering' %} selected {% endif %}>
                     Engineering
                 </option>
 
-                <option value="Diploma"
-                {% if student['department'] == 'Diploma' %}
-                selected
-                {% endif %}>
+                <option value="Diploma" {% if student['department']=='Diploma' %} selected {% endif %}>
                     Diploma
                 </option>
 
-                <option value="Pharmacy"
-                {% if student['department'] == 'Pharmacy' %}
-                selected
-                {% endif %}>
+                <option value="Pharmacy" {% if student['department']=='Pharmacy' %} selected {% endif %}>
                     Pharmacy
                 </option>
 
-                <option value="School"
-                {% if student['department'] == 'School' %}
-                selected
-                {% endif %}>
+                <option value="School" {% if student['department']=='School' %} selected {% endif %}>
                     School
                 </option>
 
@@ -108,13 +75,8 @@ Dashboard
                 Academic Level
             </label>
 
-            <input
-                type="text"
-                name="academic_level"
-                class="form-input"
-                value="{{ student['academic_level'] }}"
-                required
-            >
+            <input type="text" name="academic_level" class="form-input" value="{{ student['academic_level'] }}"
+                required>
 
         </div>
 
@@ -125,13 +87,7 @@ Dashboard
                 Room
             </label>
 
-            <input
-                type="text"
-                name="room"
-                class="form-input"
-                value="{{ student['room'] }}"
-                required
-            >
+            <input type="text" name="room" class="form-input" value="{{ student['room'] }}" required>
 
         </div>
 
@@ -142,29 +98,17 @@ Dashboard
                 Hostel
             </label>
 
-            <select
-                name="hostel"
-                class="form-select"
-            >
+            <select name="hostel" class="form-select">
 
-                <option value="Shivneri"
-                {% if student['hostel'] == 'Shivneri' %}
-                selected
-                {% endif %}>
+                <option value="Shivneri" {% if student['hostel']=='Shivneri' %} selected {% endif %}>
                     Shivneri
                 </option>
 
-                <option value="Raigad"
-                {% if student['hostel'] == 'Raigad' %}
-                selected
-                {% endif %}>
+                <option value="Raigad" {% if student['hostel']=='Raigad' %} selected {% endif %}>
                     Raigad
                 </option>
 
-                <option value="Rajgad"
-                {% if student['hostel'] == 'Rajgad' %}
-                selected
-                {% endif %}>
+                <option value="Rajgad" {% if student['hostel']=='Rajgad' %} selected {% endif %}>
                     Rajgad
                 </option>
 
@@ -175,17 +119,11 @@ Dashboard
 
         <div class="form-actions">
 
-            <button
-                type="submit"
-                class="primary-btn"
-            >
+            <button type="submit" class="primary-btn">
                 Update Student
             </button>
 
-            <a
-                href="/student_list"
-                class="secondary-btn"
-            >
+            <a href="/student_list" class="secondary-btn">
                 Back
             </a>
 

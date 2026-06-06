@@ -207,14 +207,14 @@ def login():
 
             session['admin_username'] = admin[1]
 
-            flash('Login successful!')
+            flash('Login successful!',"success")
 
             return redirect('/')
 
 
         else:
 
-            flash('Invalid username or password')
+            flash('Invalid username or password',"error")
 
             return redirect('/login')
 
@@ -237,21 +237,21 @@ def signup():
 
         if len(password) < 8:
 
-            flash("Password must be at least 8 characters")
+            flash("Password must be at least 8 characters","error")
 
             return redirect('/signup')
 
 
         if not re.search(r"[A-Za-z]", password):
 
-            flash("Password must contain letters")
+            flash("Password must contain letters","error")
 
             return redirect('/signup')
 
 
         if not re.search(r"[0-9]", password):
 
-            flash("Password must contain numbers")
+            flash("Password must contain numbers","error")
 
             return redirect('/signup')
 
@@ -261,7 +261,7 @@ def signup():
 
         if password != confirm_password:
 
-            flash("Passwords do not match")
+            flash("Passwords do not match","error")
 
             return redirect('/signup')
 
@@ -299,7 +299,7 @@ def signup():
 
             conn.close()
 
-            flash("Username already exists")
+            flash("Username already exists","error")
 
             return redirect('/signup')
 
@@ -327,7 +327,7 @@ def signup():
         conn.close()
 
 
-        flash("Account created successfully!")
+        flash("Account created successfully!","success")
 
         return redirect("/login")
 
@@ -340,7 +340,7 @@ def logout():
 
     session.clear()
 
-    flash('Logged out successfully!')
+    flash('Logged out successfully!',"success")
 
     return redirect('/login')
 
@@ -625,7 +625,7 @@ def add_student():
 
         if not mobile.isdigit() or len(mobile) != 10:
 
-            flash("Mobile number must be exactly 10 digits")
+            flash("Mobile number must be exactly 10 digits","error")
 
             return redirect(request.url)
         
@@ -633,6 +633,22 @@ def add_student():
         admin_id = session['admin_id']
 
         conn = connect_db()
+
+        
+        existing = conn.execute(
+            "SELECT * FROM students WHERE mobile = ?",
+            (mobile,)
+        ).fetchone()
+
+        if existing:
+
+            flash(
+                "Mobile number already exists",
+                "error"
+            )
+
+            return redirect("/add_student")
+
 
         student_count = conn.execute(
 
@@ -682,7 +698,7 @@ def add_student():
 
             conn.close()
 
-            flash("Student with this mobile already exists")
+            flash("Student with this mobile already exists","error")
 
             return redirect('/add_student')
         
@@ -751,7 +767,7 @@ def add_student():
         conn.commit()
         conn.close()
 
-        flash("Student added successfully!")
+        flash("Student added successfully!","success")
 
         return redirect('/student_list')
 
@@ -784,7 +800,7 @@ def add_student():
 
         conn.close()
 
-        flash("Unauthorized delete attempt")
+        flash("Unauthorized delete attempt","error")
 
         return redirect('/student_list')
 
@@ -803,7 +819,7 @@ def add_student():
 
     conn.close()
 
-    flash("Student deleted successfully!")
+    flash("Student deleted successfully!","success")
 
     return redirect('/student_list')
 
@@ -867,7 +883,7 @@ def receive_payment():
 
     if amount <= 0:
 
-        flash("Payment amount must be greater than 0")
+        flash("Payment amount must be greater than 0","error")
 
         conn.close()
 
@@ -899,7 +915,7 @@ def receive_payment():
 
         conn.close()
 
-        flash("Unauthorized payment attempt")
+        flash("Unauthorized payment attempt","error")
 
         return redirect('/student_list')
 
@@ -912,7 +928,7 @@ def receive_payment():
 
     if amount > current_remaining:
 
-        flash("Payment exceeds remaining amount")
+        flash("Payment exceeds remaining amount","error")
 
         conn.close()
 
@@ -977,7 +993,7 @@ def receive_payment():
     conn.close()
 
 
-    flash("Payment received successfully!")
+    flash("Payment received successfully!","success")
 
     return redirect(f'/student_profile/{student_id}')
 
@@ -1058,7 +1074,7 @@ def update_student():
 
         conn.close()
 
-        flash("Unauthorized update attempt")
+        flash("Unauthorized update attempt","error")
 
         return redirect('/student_list')
     
@@ -1099,7 +1115,7 @@ def update_student():
 
         conn.close()
 
-        flash("Mobile number already exists")
+        flash("Mobile number already exists","error")
 
         return redirect(f'/edit_student/{student_id}')
 
@@ -1133,7 +1149,7 @@ def update_student():
     conn.commit()
     conn.close()
 
-    flash("Student updated successfully!")
+    flash("Student updated successfully!","success")
 
     return redirect('/student_list')
 
@@ -1194,10 +1210,18 @@ def student_profile(student_id):
 
     conn.close()
 
+    name = student["name"]
+
+    initials = "".join(
+        word[0].upper()
+        for word in name.split()[:2]
+    )
+
     return render_template(
         "student_profile.html",
         student=student,
-        payments=payments
+        payments=payments,
+        initials=initials
     )
 
 
@@ -1232,18 +1256,27 @@ def receive_payment_page(student_id):
 
         conn.close()
 
-        flash("Unauthorized access")
+        flash("Unauthorized access","error")
 
         return redirect('/student_list')
 
 
     conn.close()
 
+
+    name = student["name"]
+
+    initials = "".join(
+        word[0].upper()
+        for word in name.split()[:2]
+    )
+
     return render_template(
 
         "receive_payment.html",
 
-        student=student
+        student=student,
+        initials=initials
 
     )
 
@@ -1256,7 +1289,7 @@ def pending_payments():
     admin_id = session['admin_id']
     payment_filter = request.args.get('payment_filter')
 
-    if payment_filter == "0_5000":
+    if payment_filter == "1_5000":
 
         students = conn.execute(
 
@@ -1268,7 +1301,8 @@ def pending_payments():
 
             WHERE admin_id = ?
 
-            AND (total_fees - received_amount) BETWEEN 0 AND 5000
+            AND (total_fees - received_amount) > 0
+            AND (total_fees - received_amount) <= 5000
 
             ORDER BY (total_fees - received_amount) ASC
 
@@ -1279,7 +1313,7 @@ def pending_payments():
         ).fetchall()
 
 
-    elif payment_filter == "5000_15000":
+    elif payment_filter == "1_15000":
 
         students = conn.execute(
 
@@ -1291,7 +1325,9 @@ def pending_payments():
 
             WHERE admin_id = ?
 
-            AND (total_fees - received_amount) BETWEEN 5000 AND 15000
+            
+            AND (total_fees - received_amount) > 0
+            AND (total_fees - received_amount) <= 15000
 
             ORDER BY (total_fees - received_amount) DESC
 

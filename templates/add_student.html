@@ -10,79 +10,78 @@ Dashboard
 <div class="container">
 
   <div class="student-form-card ui-card">
+    <h1>Add New Student</h1>
+    <p class="form-subtitle">
+      Register a new student and assign hostel details
+    </p>
 
-    <h1 class="page-title">
-      Add New Student
+    <div class="form-card">
 
-      <div class="form-card">
+      <form method="POST">
 
-        <form method="POST">
+        <label class="form-label">Student Name</label>
+        <input type="text" class="form-input" name="name" required>
 
-          <label class="form-label">Student Name</label>
-          <input type="text" class="form-input" name="name" required>
+        <label class="form-label">Mobile Number</label>
+        <input type="tel" name="mobile" class="form-input" maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
+          placeholder="Enter 10-digit mobile number" required>
 
-          <label class="form-label">Room Number</label>
-          <input type="text" class="form-input" name="room" required>
 
-          <label class="form-label">Hostel</label>
-          <select class="form-select" name="hostel" required>
 
-            <option value="">Select Hostel</option>
+        <label class="form-label">Hostel</label>
+        <select class="form-select" name="hostel" required>
 
-            <option>Shivneri</option>
-            <option>Raigad</option>
-            <option>Rajgad</option>
+          <option value="">Select Hostel</option>
 
-          </select>
+          <option>Shivneri</option>
+          <option>Raigad</option>
+          <option>Rajgad</option>
 
-          <label class="form-label">Department</label>
+        </select>
 
-          <select class="form-group" name="department" required>
+        <label class="form-label">Room Number</label>
+        <input type="text" class="form-input" name="room" required>
 
-            <option value="">Select Department</option>
 
-            <option value="Engineering">
-              Engineering
-            </option>
+        <label class="form-label">Department</label>
 
-            <option value="Diploma">
-              Diploma
-            </option>
+        <select class="form-group" name="department" required>
 
-            <option value="Pharmacy">
-              Pharmacy
-            </option>
+          <option value="">Select Department</option>
 
-            <option value="School">
-              School
-            </option>
+          <option value="Engineering">
+            Engineering
+          </option>
 
-          </select>
+          <option value="Diploma">
+            Diploma
+          </option>
 
-          <label class="form-label">Mobile Number</label>
-          <input
-    type="tel"
-    name="mobile"
-    class="form-input"
-    maxlength="10"
-    pattern="[0-9]{10}"
-    inputmode="numeric"
-    placeholder="Enter 10-digit mobile number"
-    required
->
+          <option value="Pharmacy">
+            Pharmacy
+          </option>
 
-          <label class="form-label">Academic Level</label>
-          <input type="text" class="form-input" name="academic_level" placeholder="dept-year">
+          <option value="School">
+            School
+          </option>
 
-          <br><br>
+        </select>
 
-          <button type="submit" class="submit-btn primary-btn">
-            Add Student
-          </button>
 
-        </form>
 
-      </div>
+        <label class="form-label">Academic Level</label>
+        <input type="text" class="form-input" name="academic_level" placeholder="dept-year">
+
+        <br><br>
+
+        <button type="submit" class="submit-btn primary-btn">
+          Add Student
+        </button>
+       
+
+      </form>
+
+    </div>
 
   </div>
 </div>

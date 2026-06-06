@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}
@@ -7,72 +6,97 @@ Dashboard
 
 {% block content %}
 
+<div class="login-wrapper">
+    <div class="login-page">
 
-<div class="login-page">
+        
 
-    <div class="login-container">
+            <div class="login-left">
 
-        <div class="login-card">
+                <div class="brand-content">
 
-            <h1>Create Account</h1>
+                    <div class="brand-icon">
+                        📋
+                    </div>
 
-            <p>Register new admin account</p>
+                    <h1 class="brand-title">
+                        Join Mess Manager
+                    </h1>
 
+                    <p class="brand-tagline">
+                        Create an administrator account and start managing your hostel effortlessly.
+                    </p>
 
-            
+                    <div class="feature-list">
 
-            <form method="POST">
+                        <div class="feature-item">
+                            ✓ Secure Admin Access
+                        </div>
 
-                <input type="text"
+                        <div class="feature-item">
+                            ✓ Student Registration
+                        </div>
 
-                       name="username"
+                        <div class="feature-item">
+                            ✓ Fee Collection Tracking
+                        </div>
 
-                       placeholder="Username"
+                        <div class="feature-item">
+                            ✓ Professional PDF Reports
+                        </div>
 
-                       required>
+                    </div>
 
+                </div>
 
-                <input type="password"
-
-                       name="password"
-
-                       placeholder="Password"
-
-                       required>
-
-
-                <input type="password"
-
-                       name="confirm_password"
-
-                       placeholder="Confirm Password"
-
-                       required>
-
-
-                <button type="submit">
-
-                    Create Account
-
-                </button>
-
-            </form>
+            </div>
 
 
-            <p style="margin-top:20px; text-align:center;">
+            <div class="login-right">
 
-                Already have an account?
+                <div class="login-card">
 
-                <a href="/login">Login</a>
+                    <h1>Create Account</h1>
 
-            </p>
+                    <p>Register new admin account</p>
 
-        </div>
+
+
+
+                    <form method="POST">
+
+                        <input type="text" name="username" placeholder="Username" required>
+
+
+                        <input type="password" name="password" placeholder="Password" required>
+
+
+                        <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+
+
+                        <button type="submit">
+
+                            Create Account
+
+                        </button>
+
+                    </form>
+
+
+                    <p style="margin-top:20px; text-align:center;">
+
+                        Already have an account?
+
+                        <a href="/login">Login</a>
+
+                    </p>
+
+                </div>
+            </div>
+        
 
     </div>
-
 </div>
 
 
 {% endblock %}
-
