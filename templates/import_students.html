@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}
+Import Students
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="student-form-card ui-card">
+
+        <h1>
+            Import Students
+        </h1>
+
+        <p class="form-subtitle">
+            Upload a CSV file exported from Google Forms
+        </p>
+
+        <form method="POST" action="/import_students" enctype="multipart/form-data">
+
+            <label class="form-label">
+                Select CSV File
+            </label>
+
+            <input type="file" name="csv_file" accept=".csv" class="form-input" required>
+
+            <br><br>
+
+            <button type="submit" class="primary-btn">
+                Validate CSV
+            </button>
+
+        </form>
+
+
+
+        {% if total_rows is defined %}
+
+        <hr class="summary-divider">
+
+        <div class="import-summary ">
+
+            <h3>
+                Validation Summary
+            </h3>
+
+            <div class="summary-stats">
+
+                <p>
+                    Total Rows:
+                    <strong>{{ total_rows }}</strong>
+                </p>
+
+                <p>
+                    Valid Rows:
+                    <span class="status-paid">
+                        {{ valid_rows }}
+                    </span>
+                </p>
+
+                <p>
+                    Invalid Rows:
+                    <span class="status-pending">
+                        {{ invalid_rows }}
+                    </span>
+                </p>
+
+            </div>
+
+            {% if valid_rows > 0 %}
+
+            <form method="POST" action="/confirm_import">
+
+                <button type="submit" class="primary-btn">
+                    📥 Import {{ valid_rows }} Students
+                </button>
+
+            </form>
+
+            {% endif %}
+
+            {% if invalid_details %}
+
+            <div class="validation-errors">
+
+                <h4>
+                    Validation Errors
+                </h4>
+
+                <ul>
+
+                    {% for error in invalid_details %}
+
+                    <li>
+                        {{ error }}
+                    </li>
+
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

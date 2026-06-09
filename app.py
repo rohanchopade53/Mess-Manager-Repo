@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, flash,session
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 import csv
+import io
 from flask import Response
 from datetime import datetime
 from flask import send_file
@@ -29,6 +30,48 @@ def connect_db():
     conn.row_factory = sqlite3.Row
 
     return conn
+
+def log_activity(
+    admin_id,
+    activity_type,
+    description
+):
+
+    conn = connect_db()
+
+    created_at = datetime.now().strftime(
+        "%d-%m-%Y %H:%M"
+    )
+
+    conn.execute(
+
+        """
+
+        INSERT INTO activities
+        (
+            admin_id,
+            activity_type,
+            description,
+            created_at
+        )
+
+        VALUES (?, ?, ?, ?)
+
+        """,
+
+        (
+            admin_id,
+            activity_type,
+            description,
+            created_at
+        )
+
+    )
+
+    conn.commit()
+
+    conn.close()
+
 
 
 def create_tables():
@@ -64,6 +107,8 @@ def create_tables():
         name TEXT NOT NULL,
 
         mobile TEXT NOT NULL,
+                 
+        email TEXT  NOT NULL,
 
         hostel TEXT NOT NULL,
 
@@ -99,22 +144,39 @@ def create_tables():
     CREATE TABLE IF NOT EXISTS payments (
 
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-
         student_id INTEGER NOT NULL,
-
         amount INTEGER NOT NULL,
-
+        payment_mode TEXT NOT NULL,
         payment_date TEXT NOT NULL,
-
         FOREIGN KEY (student_id)
         REFERENCES students(id)
         ON DELETE CASCADE,
-
         CHECK(amount > 0)
 
     )
 
     """)
+
+    conn.execute("""
+
+    CREATE TABLE IF NOT EXISTS activities (
+
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        admin_id INTEGER NOT NULL,
+
+        activity_type TEXT NOT NULL,
+
+        description TEXT NOT NULL,
+
+        created_at TEXT NOT NULL
+
+    )
+
+    """)
+
+
+
     # default admin
 
     admin = conn.execute(
@@ -344,6 +406,48 @@ def logout():
 
     return redirect('/login')
 
+@app.route('/activities')
+@login_required
+def activities():
+
+    conn = connect_db()
+
+    admin_id = session['admin_id']
+
+    activities = conn.execute(
+
+        """
+
+        SELECT
+
+            activity_type,
+
+            description,
+
+            created_at
+
+        FROM activities
+
+        WHERE admin_id = ?
+
+        ORDER BY id DESC
+
+        """,
+
+        (admin_id,)
+
+    ).fetchall()
+
+    conn.close()
+
+    return render_template(
+
+        "activities.html",
+
+        activities=activities
+
+    )
+
 @app.route('/')
 @login_required
 def home():
@@ -363,6 +467,35 @@ def home():
     ,
     (admin_id,)
     ).fetchone()[0]
+
+    recent_activities = conn.execute(
+
+        """
+
+        SELECT
+            activity_type,
+            description,
+            created_at
+
+        FROM activities
+
+        WHERE admin_id = ?
+
+        ORDER BY id DESC
+
+        LIMIT 5
+
+        """,
+
+        (admin_id,)
+
+    ).fetchall()
+
+
+    print("ACTIVITIES:", len(recent_activities))
+
+    for activity in recent_activities:
+        print(dict(activity))
 
     total_pending = conn.execute(
 
@@ -397,37 +530,27 @@ def home():
         (admin_id,)
 
     ).fetchone()[0]
-    
 
-    recent_payments = conn.execute(
+
+    total_fees = conn.execute(
 
         """
 
-        SELECT students.name,
+        SELECT SUM(total_fees)
 
-            payments.amount,
+        FROM students
 
-            payments.payment_date
-
-        FROM payments
-
-        JOIN students
-
-        ON payments.student_id = students.id
-
-        WHERE students.admin_id = ?
-
-        ORDER BY payments.id DESC
-
-        LIMIT 5
+        WHERE admin_id = ?
 
         """,
 
         (admin_id,)
 
-    ).fetchall()
+    ).fetchone()[0]
 
-
+    if total_fees is None:
+        total_fees = 0
+        
     conn.close()
 
     if total_collected is None:
@@ -436,15 +559,351 @@ def home():
     if total_pending is None:
         total_pending = 0
 
+
+    if total_fees > 0:
+        collection_percentage = round(
+            (total_collected / total_fees) * 100
+        )
+
+    else:
+        collection_percentage = 0
+
+
+    if collection_percentage < 30:
+
+        progress_color = "#dc2626"   # Red
+
+    elif collection_percentage < 70:
+
+        progress_color = "#f59e0b"   # Orange
+
+    else:
+
+        progress_color = "#16a34a"   # Green
+
     return render_template(
         "home.html",
         total_students=total_students,
         total_collected=total_collected,
         total_pending=total_pending,
         pending_students=pending_students,
-
-        recent_payments=recent_payments
+        recent_activities=recent_activities,
+        collection_percentage=collection_percentage,
+        total_fees=total_fees,
+        progress_color=progress_color
     )
+
+
+@app.route('/import_students', methods=['GET', 'POST'])
+@login_required
+def import_students():
+
+    if request.method == 'POST':
+
+        print("POST RECEIVED")
+
+        csv_file = request.files['csv_file']
+
+        if not csv_file:
+
+            flash(
+                "Please select a CSV file",
+                "error"
+            )
+
+            return redirect('/import_students')
+
+        csv_data = csv_file.read().decode('utf-8')
+
+        reader = csv.DictReader(
+            io.StringIO(csv_data)
+        )
+
+        total_rows = 0
+        valid_rows = 0
+        invalid_rows = 0
+
+        conn = connect_db()
+        admin_id = session['admin_id']
+
+        invalid_details = []
+        valid_students = []
+
+
+        for row_number, row in enumerate(reader, start=2):
+            total_rows += 1
+
+            name = row.get("Name", "").strip()
+            mobile = row.get("Mobile", "").strip()
+            hostel = row.get("Hostel", "").strip()
+            room = row.get("Room", "").strip()
+            department = row.get("Department", "").strip()
+            academic_level = row.get("Academic Level", "").strip()
+            email = row.get("Email", "").strip()
+
+            if not all([
+                name,
+                mobile,
+                hostel,
+                room,
+                department,
+                academic_level
+            ]):
+
+                invalid_rows += 1
+
+                invalid_details.append(
+                    f"Row {row_number}: Missing required fields"
+                )
+
+                continue
+
+            if not mobile.isdigit() or len(mobile) != 10:
+                invalid_rows += 1
+
+                invalid_details.append(
+                    f"Row {row_number}: Invalid mobile number"
+                )
+
+                continue
+
+
+            existing_student = conn.execute(
+
+                """
+                SELECT id
+                FROM students
+                WHERE mobile = ?
+                AND admin_id = ?
+                """,
+
+                (mobile, admin_id)
+
+            ).fetchone()
+
+            if existing_student:
+
+                invalid_rows += 1
+
+                invalid_details.append(
+                    f"Row {row_number}: {name} already exists"
+                )
+
+                continue
+
+
+            if email and not re.match(
+                r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",
+                email
+            ):
+
+                invalid_rows += 1
+
+                invalid_details.append(
+                    f"Row {row_number}: Invalid email"
+                )
+
+                continue
+
+            valid_rows += 1
+
+            valid_students.append({
+
+                "name": name,
+
+                "mobile": mobile,
+
+                "email": email,
+
+                "hostel": hostel,
+
+                "room": room,
+
+                "department": department,
+
+                "academic_level": academic_level
+
+            })
+
+        session['valid_students'] = valid_students
+
+        conn.close()
+
+        print(
+            total_rows,
+            valid_rows,
+            invalid_rows,
+            invalid_details
+        )
+
+        return render_template(
+
+            "import_students.html",
+
+            total_rows=total_rows,
+
+            valid_rows=valid_rows,
+
+            invalid_rows=invalid_rows,
+
+            invalid_details=invalid_details
+
+        )
+
+    return render_template(
+        "import_students.html"
+    )
+
+@app.route('/confirm_import', methods=['POST'])
+@login_required
+def confirm_import():
+
+    valid_students = session.get(
+        'valid_students',
+        []
+    )
+
+    if not valid_students:
+
+        flash(
+            "No validated students found",
+            "error"
+        )
+
+        return redirect('/import_students')
+
+    conn = connect_db()
+
+    admin_id = session['admin_id']
+
+    imported_count = 0
+
+    for student in valid_students:
+
+        student_count = conn.execute(
+
+            """
+
+            SELECT COUNT(*)
+
+            FROM students
+
+            WHERE admin_id = ?
+
+            """,
+
+            (admin_id,)
+
+        ).fetchone()[0]
+
+        student_code = f"MM{student_count + 1:03}"
+
+        print(
+            student['name'],
+            student_code
+        )
+
+        joining_date = datetime.now().strftime(
+            "%d-%m-%Y"
+        )
+
+        conn.execute(
+
+            """
+
+            INSERT INTO students
+            (
+
+                admin_id,
+
+                student_code,
+
+                name,
+
+                mobile,
+
+                email,
+
+                hostel,
+
+                room,
+
+                department,
+
+                academic_level,
+
+                total_fees,
+
+                received_amount,
+
+                joining_date
+
+            )
+
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+            """,
+
+            (
+
+                admin_id,
+
+                student_code,
+
+                student['name'],
+
+                student['mobile'],
+
+                student['email'],
+
+                student['hostel'],
+
+                student['room'],
+
+                student['department'],
+
+                student['academic_level'],
+
+                30000,
+
+                0,
+
+                joining_date
+
+            )
+
+        )
+
+        imported_count += 1
+
+    conn.commit()
+
+    log_activity(
+
+        admin_id,
+
+        "Import",
+
+        f"Imported {imported_count} students"
+
+    )
+
+    conn.close()
+
+    session.pop(
+        'valid_students',
+        None
+    )
+
+    flash(
+        f"{imported_count} students imported successfully!",
+        "success"
+    )
+
+    return redirect(
+        '/student_list'
+    )
+
 
 
 @app.route('/add_student_page')
@@ -622,6 +1081,7 @@ def add_student():
         hostel = request.form['hostel'].strip()
         department = request.form['department'].strip()
         mobile = request.form['mobile'].strip()
+        email = request.form['email'].strip()
 
         if not mobile.isdigit() or len(mobile) != 10:
 
@@ -629,26 +1089,23 @@ def add_student():
 
             return redirect(request.url)
         
+        if email and not re.match(
+
+            r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",
+
+            email
+
+        ):
+
+            flash("Enter a valid email address", "error")
+
+            return redirect(request.url)
+        
+        
         academic_level = request.form['academic_level'].strip()
         admin_id = session['admin_id']
 
         conn = connect_db()
-
-        
-        existing = conn.execute(
-            "SELECT * FROM students WHERE mobile = ?",
-            (mobile,)
-        ).fetchone()
-
-        if existing:
-
-            flash(
-                "Mobile number already exists",
-                "error"
-            )
-
-            return redirect("/add_student")
-
 
         student_count = conn.execute(
 
@@ -717,6 +1174,8 @@ def add_student():
 
                 mobile,
 
+                email,
+
                 hostel,
 
                 room,
@@ -733,7 +1192,7 @@ def add_student():
 
             )
 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
             """,
 
@@ -746,6 +1205,8 @@ def add_student():
                 name,
 
                 mobile,
+
+                email,
 
                 hostel,
 
@@ -765,6 +1226,17 @@ def add_student():
 
         )
         conn.commit()
+
+        log_activity(
+
+            admin_id,
+
+            "Student",
+
+            f"Added student {name}"
+
+        )
+
         conn.close()
 
         flash("Student added successfully!","success")
@@ -875,9 +1347,11 @@ def receive_payment():
 
     amount = int(request.form['amount'])
 
-    conn = connect_db()
-    admin_id = session['admin_id']
+    payment_mode = request.form['payment_mode']
 
+    conn = connect_db()
+
+    admin_id = session['admin_id']
 
     # Prevent zero or negative payment
 
@@ -897,6 +1371,7 @@ def receive_payment():
         """
 
         SELECT
+            name,
             received_amount,
             total_fees
         FROM students
@@ -919,7 +1394,7 @@ def receive_payment():
 
         return redirect('/student_list')
 
-    current_received = student[0]
+    current_received = student['received_amount']
 
     current_remaining = student['total_fees'] - student['received_amount']
 
@@ -938,9 +1413,6 @@ def receive_payment():
     # Calculate updated values
 
     new_received = current_received + amount
-
-    
-
 
     # Update student table
 
@@ -975,20 +1447,32 @@ def receive_payment():
         (
             student_id,
             amount,
+            payment_mode,
             payment_date
         )
 
-        VALUES (?, ?, ?)
+        VALUES (?, ?, ?, ?)
+
 
         """,
 
-        (student_id, amount, payment_date)
+        (student_id, amount, payment_mode ,payment_date)
 
     )
 
 
 
     conn.commit()
+
+    log_activity(
+
+        admin_id,
+
+        "Payment",
+
+        f"{student['name']} paid ₹{amount} via {payment_mode}"
+
+    )
 
     conn.close()
 
@@ -1047,11 +1531,13 @@ def update_student():
     room = request.form['room'].strip()
     hostel = request.form['hostel'].strip()
     mobile = request.form['mobile'].strip()
+    email = request.form['email'].strip()
     department = request.form['department'].strip()
     academic_level = request.form['academic_level'].strip()
 
     conn = connect_db()
     admin_id = session['admin_id']
+    
     student = conn.execute(
 
         """
@@ -1060,7 +1546,7 @@ def update_student():
 
         FROM students
 
-        WHERE student_id = ?
+        WHERE id = ?
 
         AND admin_id = ?
 
@@ -1089,6 +1575,14 @@ def update_student():
 
         return redirect(f'/edit_student/{student_id}')
     
+    if email and not re.match(
+        r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",
+        email
+    ):
+        flash("Enter a valid email address", "error")
+        conn.close()
+        return redirect(f'/edit_student/{student_id}')
+    
     # Duplicate mobile validation
 
     existing_mobile = conn.execute(
@@ -1101,7 +1595,7 @@ def update_student():
 
         WHERE mobile = ?
 
-        AND student_id != ?
+        AND id != ?
 
         AND admin_id = ?
 
@@ -1128,6 +1622,7 @@ def update_student():
         room=?,
         hostel=?,
         mobile=?,
+        email=?,
         department=?,
         academic_level=?
         WHERE id=?
@@ -1139,10 +1634,11 @@ def update_student():
             room,
             hostel,
             mobile,
+            email,
             department,
             academic_level,
-            admin_id,
-            student_id
+            student_id,
+            admin_id
         )
     )
 
@@ -1194,7 +1690,9 @@ def student_profile(student_id):
 
     SELECT
         amount,
+        payment_mode,
         payment_date
+
 
     FROM payments
 

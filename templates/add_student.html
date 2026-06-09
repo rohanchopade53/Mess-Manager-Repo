@@ -20,13 +20,14 @@ Dashboard
       <form method="POST">
 
         <label class="form-label">Student Name</label>
-        <input type="text" class="form-input" name="name" required>
+        <input type="text" class="form-input" placeholder="Enter your full name" name="name" required>
 
         <label class="form-label">Mobile Number</label>
         <input type="tel" name="mobile" class="form-input" maxlength="10" pattern="[0-9]{10}" inputmode="numeric"
           placeholder="Enter 10-digit mobile number" required>
 
-
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" class="form-input" placeholder="student@example.com" required>
 
         <label class="form-label">Hostel</label>
         <select class="form-select" name="hostel" required>
@@ -74,10 +75,18 @@ Dashboard
 
         <br><br>
 
-        <button type="submit" class="submit-btn primary-btn">
-          Add Student
-        </button>
-       
+<div class="student-actions">
+
+    <button type="submit" class="submit-btn primary-btn">
+        Add Student
+    </button>
+
+    <a href="/import_students" class="secondary-btn">
+        📥 Import Students
+    </a>
+
+</div>
+
 
       </form>
 

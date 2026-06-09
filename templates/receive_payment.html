@@ -12,13 +12,13 @@ Receive Payment
 
         <div class="page-heading">
 
-        <h1 class="page-title">
-            Receive Payment
-        </h1>
+            <h1 class="page-title">
+                Receive Payment
+            </h1>
 
-        <p class="form-subtitle">
-            Record a new payment for this student
-        </p>
+            <p class="form-subtitle">
+                Record a new payment for this student
+            </p>
 
         </div>
 
@@ -71,6 +71,30 @@ Receive Payment
                     max="{{ student['total_fees'] - student['received_amount'] }}" required>
 
             </div>
+
+            <label class="form-label">
+                Payment Mode
+            </label>
+
+            <select name="payment_mode" class="form-select" required>
+
+                <option value="">
+                    Select Payment Mode
+                </option>
+
+                <option value="Cash">
+                    Cash
+                </option>
+
+                <option value="UPI">
+                    UPI
+                </option>
+
+                <option value="Bank Transfer">
+                    Bank Transfer
+                </option>
+
+            </select>
 
 
             <div class="form-actions">

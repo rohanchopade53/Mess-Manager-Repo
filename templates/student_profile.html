@@ -98,6 +98,13 @@ Student Profile
             </div>
 
             <div class="detail-item">
+                <span class="detail-label">Email</span>
+                <span class="detail-value">
+                    {{ student['email'] }}
+                </span>
+            </div>
+
+            <div class="detail-item">
                 <span class="detail-label">Academic Level</span>
                 <span class="detail-value">{{ student['academic_level'] }}</span>
             </div>
@@ -151,6 +158,8 @@ Student Profile
 
                         <th>Date</th>
 
+                        <th>Mode</th>
+
                     </tr>
 
                 </thead>
@@ -164,6 +173,28 @@ Student Profile
                         <td>₹{{ payment['amount'] }}</td>
 
                         <td>{{ payment['payment_date'] }}</td>
+
+                        <td>{% if payment['payment_mode'] == 'UPI' %}
+
+<span class="payment-mode-upi">
+    UPI
+</span>
+
+{% elif payment['payment_mode'] == 'Cash' %}
+
+                            <span class="payment-mode-cash">
+                                Cash
+                            </span>
+
+                            {% else %}
+
+                            <span class="payment-mode-bank">
+                                Bank Transfer
+                            </span>
+
+                            {% endif %}
+
+                        </td>
 
                     </tr>
 
@@ -181,7 +212,7 @@ Student Profile
 
             <p class="empty-text">
                 📄 No payment records yet
-Payments received from this student will appear here.
+                Payments received from this student will appear here.
             </p>
 
         </div>

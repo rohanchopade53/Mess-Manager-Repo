@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}
+Activities
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="ui-card">
+
+        <h1 class="page-title">
+            Activity History
+        </h1>
+
+        <p class="form-subtitle">
+            Track all important system actions
+        </p>
+
+        {% if activities %}
+
+            {% for activity in activities %}
+
+                <div class="activity-item">
+
+                    <div class="activity-header">
+
+                        {% if activity['activity_type'] == 'Payment' %}
+
+                            💰 Payment Received
+
+                        {% elif activity['activity_type'] == 'Student' %}
+
+                            👤 Student Added
+
+                        {% elif activity['activity_type'] == 'Import' %}
+
+                            📥 CSV Import
+
+                        {% else %}
+
+                            📌 Activity
+
+                        {% endif %}
+
+                    </div>
+
+                    <div class="activity-description">
+
+                        {{ activity['description'] }}
+
+                    </div>
+
+                    <div class="activity-date">
+
+                        {{ activity['created_at'] }}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>
+                No activities found
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -31,15 +31,23 @@
             </a>
 
             <a href="/student_list" class="{% if request.path == '/student_list' %}active{% endif %}">
-               👥Students
+                👨‍🎓 Students
+            </a>
+
+            <a href="/import_students" class="{% if request.path == '/import_students' %}active{% endif %}">
+                📥 Import
             </a>
 
             <a href="/pending_payments" class="{% if request.path == '/pending_payments' %}active{% endif %}">
                 ⚠️ Pending
             </a>
+            <a href="/activities" class="nav-link">
+                📋 Activities
+            </a>
+
 
             <a href="/logout">
-               ⇥ Logout
+                ⇥ Logout
             </a>
 
         </div>
@@ -77,7 +85,7 @@
     <footer class="app-footer">
 
         © Mess Manager v1.0
-    Built with Flask & SQLite
+        Built with Flask & SQLite
 
     </footer>
 
