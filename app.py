@@ -277,6 +277,46 @@ def create_tables():
     
 create_tables()
 
+def find_admin(identifier):
+
+    identifier = identifier.strip().lower()
+
+    conn = connect_db()
+
+    admin = conn.execute(
+
+        """
+
+        SELECT *
+
+        FROM admin
+
+        WHERE
+
+            LOWER(username)=LOWER(?)
+
+            OR LOWER(email)=LOWER(?)
+
+            OR mobile=?
+
+        """,
+
+        (
+
+            identifier,
+
+            identifier,
+
+            identifier
+
+        )
+
+    ).fetchone()
+
+    conn.close()
+
+    return admin
+
 def send_email(receiver_email, subject, body):
 
     msg = EmailMessage()
@@ -348,30 +388,10 @@ def login():
 
     if request.method == 'POST':
 
-        username = request.form['username']
-
+        identifier = request.form['identifier'].strip()
         password = request.form['password']
 
-        conn = connect_db()
-
-        admin = conn.execute(
-
-            """
-
-            SELECT *
-
-            FROM admin
-
-            WHERE username = ?
-
-            """,
-
-            (username,)
-
-        ).fetchone()
-
-        conn.close()
-
+        admin = find_admin(identifier)
 
         if admin and check_password_hash(admin["password"],password):
 
@@ -392,7 +412,10 @@ def login():
 
         else:
 
-            flash('Invalid username or password',"error")
+            flash(
+                        "Invalid username, email, mobile number, or password.",
+                        "error"
+                    )
 
             return redirect('/login')
 
@@ -458,7 +481,7 @@ def change_password():
         return redirect('/profile')
     
     
-    if len(new_password) < 6:
+    if len(new_password) < 8:
 
         conn.close()
 
@@ -530,32 +553,25 @@ def forgot_password():
 @app.route("/send_otp", methods=["POST"])
 def send_otp():
 
-    email = request.form["email"].strip().lower()
-
-    conn = connect_db()
-
-    admin = conn.execute(
-
-        """
-        SELECT *
-        FROM admin
-        WHERE LOWER(email) = ?
-        """,
-
-        (email,)
-
-    ).fetchone()
-
-    conn.close()
+    identifier = request.form["identifier"].strip()
+    
+    admin = find_admin(identifier)
 
     if not admin:
 
-        flash("No account found with this email.", "error")
+        flash(
 
+            "No account found with the provided username, email, or mobile number.",
+
+            "error"
+
+        )
         return redirect("/forgot_password")
 
     otp = str(random.randint(100000, 999999))
 
+
+    email = admin["email"]
     session["reset_email"] = email
     session["reset_otp"] = otp
     session["otp_expiry"] = (
@@ -796,9 +812,9 @@ def signup():
 
         password = request.form['password']
 
-        email = request.form["email"]
+        email = request.form["email"].strip().lower()
 
-        mobile = request.form["mobile"]
+        mobile = request.form["mobile"].strip()
 
         confirm_password = request.form['confirm_password']
 
@@ -857,21 +873,52 @@ def signup():
 
         existing_admin = conn.execute(
 
-            "SELECT * FROM admin WHERE username = ?",
+            """
+
+            SELECT *
+
+            FROM admin
+
+            WHERE LOWER(username)=LOWER(?)
+
+            """,
 
             (username,)
 
         ).fetchone()
-
-
+        
         if existing_admin:
 
             conn.close()
 
-            flash("Username already exists","error")
+            flash("Username already exists", "error")
 
-            return redirect('/signup')
+            return redirect("/signup")
         
+        existing_mobile = conn.execute(
+
+            """
+
+            SELECT *
+
+            FROM admin
+
+            WHERE mobile = ?
+
+            """,
+
+            (mobile,)
+
+        ).fetchone()
+
+        if existing_mobile:
+
+            conn.close()
+
+            flash("Mobile number already registered", "error")
+
+            return redirect("/signup")
+
         # email varifications
 
         existing_email = conn.execute(
@@ -1971,53 +2018,6 @@ def add_student():
 
 
 
-    conn = connect_db()
-    admin_id = session['admin_id']
-
-    student = conn.execute(
-
-        """
-
-        SELECT *
-
-        FROM students
-
-        WHERE id = ?
-
-        AND admin_id = ?
-
-        """,
-
-        (student_id, admin_id)
-
-    ).fetchone()
-
-    if not student:
-
-        conn.close()
-
-        flash("Unauthorized delete attempt","error")
-
-        return redirect('/student_list')
-
-    # delete payment history first
-    conn.execute(
-        "DELETE FROM payments WHERE student_id=?",
-        (student_id,)
-    )
-
-    conn.execute(
-    "DELETE FROM students WHERE id=? AND admin_id=?",
-    (student_id, admin_id)
-)
-
-    conn.commit()
-
-    conn.close()
-
-    flash("Student deleted successfully!","success")
-
-    return redirect('/student_list')
 
 
 @app.route('/payment_history/<int:student_id>')
