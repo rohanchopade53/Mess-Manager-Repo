@@ -13,15 +13,17 @@
 
 </head>
 
-<body>
-
+<body class="{{ session.get('theme', 'light') }}">
     {% if session.get('admin_logged_in') %}
 
     <div class="topbar">
 
 
         <div class="logo">
-            🍽️ Mess Manager
+
+            <span class="logo-light">Mess</span>
+            <span class="logo-accent">Manager</span>
+
         </div>
 
         <div class="nav-links">
@@ -45,10 +47,10 @@
                 📋 Activities
             </a>
 
-
-            <a href="/logout">
-                ⇥ Logout
+            <a href="/profile" class="nav-link">
+                Profile
             </a>
+
 
         </div>
 

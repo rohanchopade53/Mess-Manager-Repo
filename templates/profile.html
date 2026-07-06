@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}
+Account Settings
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="settings-wrapper">
+
+        <div class="profile-header-card ui-card">
+
+            <div class="profile-avatar">
+
+                {{ admin_username[:2].upper() }}
+
+            </div>
+
+            <h2 class="profile-admin-name">
+
+                {{ admin_username }}
+
+            </h2>
+
+            <div class="profile-role">
+
+                Administrator
+
+            </div>
+
+            <div class="profile-badges">
+
+                <span class="profile-badge">
+                    ● Active Session
+                </span>
+
+                <span class="profile-badge">
+                    🌙 {{ current_theme.title() }}
+                </span>
+
+            </div>
+
+            <div class="profile-divider"></div>
+
+            <div class="profile-info-row">
+
+                <span>Username</span>
+
+                <strong>{{ admin_username }}</strong>
+
+            </div>
+
+
+
+            <div class="profile-info-row">
+
+                <span>Theme</span>
+
+                <strong>{{ session.get('theme', 'Light')|title }}</strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="settings-card ui-card">
+
+            <div class="settings-item">
+
+                <div>
+
+                    <h3 class="settings-card-title">
+                        🎨 Appearance
+                    </h3>
+
+                    <p class="settings-description">
+                        Customize theme and display preferences
+                    </p>
+
+                </div>
+
+                <form action="/set_theme" method="POST">
+
+                    <select name="theme" class="theme-select" onchange="this.form.submit()">
+
+                        <option value="light" {% if current_theme=="light" %}selected{% endif %}>
+                            ☀ Light
+                        </option>
+
+                        <option value="midnight" {% if current_theme=="midnight" %}selected{% endif %}>
+                            🌙 Midnight
+                        </option>
+
+                        <option value="dark" {% if current_theme=="dark" %}selected{% endif %}>
+                            🌑 Dark
+                        </option>
+
+                    </select>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="settings-card ui-card">
+
+            <div class="settings-item">
+
+                <div>
+
+                    <h3 class="settings-card-title">
+                        🔐 Security
+                    </h3>
+
+                    <p class="settings-description">
+                        Update your account password
+                    </p>
+
+                </div>
+
+                <a href="/change_password_page" class="primary-btn">
+
+                    Change Password
+
+                </a>
+
+            </div>
+
+            <div class="login-links">
+
+                <a href="/forgot_password">
+
+                    Forgot Password?
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div class="settings-card ui-card">
+
+            <h3 class="settings-card-title">
+                🚪 Logout
+            </h3>
+
+            <p class="settings-description">
+                Sign out from your account
+            </p>
+
+            <a href="/logout" class="danger-btn">
+                Logout
+            </a>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

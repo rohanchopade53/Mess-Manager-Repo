@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, flash,session
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import( generate_password_hash, check_password_hash)
 import sqlite3
 import csv
 import io
@@ -17,9 +17,44 @@ from reportlab.lib.styles import getSampleStyleSheet
 from functools import wraps
 import re
 
+import smtplib
+from email.message import EmailMessage
+import random
+from datetime import datetime, timedelta
+
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = 'messmanagersecretkey'
+
+class Config:
+
+    SECRET_KEY = os.getenv("SECRET_KEY")
+    EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
+    EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+
+app.config.from_object(Config)
+
+app.secret_key = app.config["SECRET_KEY"]
+
+EMAIL_ADDRESS = app.config["EMAIL_ADDRESS"]
+EMAIL_PASSWORD = app.config["EMAIL_PASSWORD"]
+
+if not EMAIL_ADDRESS or not EMAIL_PASSWORD:
+
+    raise RuntimeError(
+        "EMAIL_ADDRESS or EMAIL_PASSWORD is missing from .env"
+    )
+
+
+
+
+
+if not app.secret_key:
+    raise RuntimeError(
+        "SECRET_KEY is missing from .env"
+    )
 
 def connect_db():
 
@@ -73,12 +108,12 @@ def log_activity(
     conn.close()
 
 
-
 def create_tables():
 
     conn = connect_db()
 
     # admin table
+# Admin table
     conn.execute("""
 
     CREATE TABLE IF NOT EXISTS admin (
@@ -87,7 +122,13 @@ def create_tables():
 
         username TEXT NOT NULL UNIQUE,
 
-        password TEXT NOT NULL
+        email TEXT NOT NULL UNIQUE,
+
+        mobile TEXT,
+
+        password TEXT NOT NULL,
+
+        theme TEXT DEFAULT 'light'
 
     )
 
@@ -196,15 +237,36 @@ def create_tables():
 
             """
 
-            INSERT INTO admin (username, password)
+            INSERT INTO admin
+            (
+                username,
+                email,
+                mobile,
+                password,
+                theme
+            )
 
-            VALUES (?, ?)
+            VALUES (?, ?, ?, ?, ?)
 
             """,
 
-            ('admin', hashed_password)
+            (
+
+                "admin",
+
+                "admin@gmail.com",
+
+                "9999999999",
+
+                hashed_password,
+
+                "light"
+
+            )
 
         )
+
+
 
 
 
@@ -215,6 +277,36 @@ def create_tables():
     
 create_tables()
 
+def send_email(receiver_email, subject, body):
+
+    msg = EmailMessage()
+
+    msg["Subject"] = subject
+    msg["From"] = EMAIL_ADDRESS
+    msg["To"] = receiver_email
+
+    msg.set_content(body)
+
+    try:
+
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+
+            server.starttls()
+
+            server.login(
+                EMAIL_ADDRESS,
+                EMAIL_PASSWORD
+            )
+
+            server.send_message(msg)
+
+        return True
+
+    except Exception as e:
+
+        print("Email Error:", e)
+
+        return False
 
 def login_required(func):
 
@@ -229,6 +321,26 @@ def login_required(func):
         return func(*args, **kwargs)
 
     return wrapper
+
+
+@app.route("/test_email")
+def test_email():
+
+    success = send_email(
+
+        "rchopade422@gmail.com",
+
+        "Mess Manager Test",
+
+        "Congratulations! Your Flask email setup is working successfully."
+
+    )
+
+    if success:
+        return "Email sent successfully!"
+
+    else:
+        return "Failed to send email."
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -261,13 +373,17 @@ def login():
         conn.close()
 
 
-        if admin and check_password_hash(admin[2], password):
+        if admin and check_password_hash(admin["password"],password):
 
             session['admin_logged_in'] = True
 
-            session['admin_id'] = admin[0]
+            session['admin_id'] = admin['id']
 
-            session['admin_username'] = admin[1]
+            session['admin_username'] = admin['username']
+
+            session['theme'] = admin['theme']
+
+           
 
             flash('Login successful!',"success")
 
@@ -283,6 +399,393 @@ def login():
 
     return render_template('login.html')
 
+@app.route('/change_password', methods=['POST'])
+@login_required
+def change_password():
+    print("CHANGE PASSWORD ROUTE HIT")
+
+    current_password = request.form['current_password']
+
+    new_password = request.form['new_password']
+
+    confirm_password = request.form['confirm_password']
+
+    admin_id = session['admin_id']
+
+    conn = connect_db()
+
+    admin = conn.execute(
+
+        """
+
+        SELECT *
+
+        FROM admin
+
+        WHERE id = ?
+
+        """,
+
+        (admin_id,)
+
+    ).fetchone()
+
+    if not check_password_hash(
+        admin['password'],
+        current_password
+    ):
+
+        conn.close()
+
+        flash(
+            "Current password is incorrect",
+            "error"
+        )
+
+        return redirect('/profile')
+
+    if new_password != confirm_password:
+
+    
+
+        conn.close()
+
+        flash(
+            "New passwords do not match",
+            "error"
+        )
+
+        return redirect('/profile')
+    
+    
+    if len(new_password) < 6:
+
+        conn.close()
+
+        flash(
+            "Password must be at least 6 characters",
+            "error"
+        )
+
+        return redirect('/profile')
+
+    hashed_password = generate_password_hash(
+        new_password
+    )
+
+    conn.execute(
+
+        """
+
+        UPDATE admin
+
+        SET password = ?
+
+        WHERE id = ?
+
+        """,
+
+        (
+            hashed_password,
+            admin_id
+        )
+
+    )
+
+    conn.commit()
+
+
+    log_activity(
+
+        admin_id,
+
+        "Security",
+
+        "Password changed"
+
+    )
+
+    conn.close()
+
+    flash(
+        "Password updated successfully",
+        "success"
+    )
+
+    return redirect('/profile')
+
+@app.route('/change_password_page')
+@login_required
+def change_password_page():
+
+    return render_template(
+        'change_password.html'
+    )
+
+@app.route("/forgot_password")
+def forgot_password():
+
+    return render_template("forgot_password.html")
+
+@app.route("/send_otp", methods=["POST"])
+def send_otp():
+
+    email = request.form["email"].strip().lower()
+
+    conn = connect_db()
+
+    admin = conn.execute(
+
+        """
+        SELECT *
+        FROM admin
+        WHERE LOWER(email) = ?
+        """,
+
+        (email,)
+
+    ).fetchone()
+
+    conn.close()
+
+    if not admin:
+
+        flash("No account found with this email.", "error")
+
+        return redirect("/forgot_password")
+
+    otp = str(random.randint(100000, 999999))
+
+    session["reset_email"] = email
+    session["reset_otp"] = otp
+    session["otp_expiry"] = (
+        datetime.now() + timedelta(minutes=5)
+    ).isoformat()
+
+
+
+    session["resend_available_at"] = (
+        datetime.now() + timedelta(seconds=60)
+    ).isoformat()
+
+    subject = "Mess Manager Password Reset OTP"
+
+    body = f"""
+Hello,
+
+Your OTP for resetting your Mess Manager password is:
+
+{otp}
+
+This OTP is valid for 5 minutes.
+
+If you did not request a password reset, you can ignore this email.
+
+Regards,
+Mess Manager
+"""
+
+    if send_email(email, subject, body):
+
+        flash("OTP sent successfully to your email.", "success")
+
+        return redirect("/verify_otp")
+
+    else:
+
+        flash("Failed to send OTP. Please try again.", "error")
+
+        return redirect("/forgot_password")
+
+@app.route("/verify_otp", methods=["GET", "POST"])
+def verify_otp():
+
+    if request.method == "GET":
+
+        email = session.get("reset_email")
+
+        if not email:
+
+            flash(
+                "Please request an OTP first.",
+                "error"
+            )
+
+            return redirect("/forgot_password")
+
+        name, domain = email.split("@")
+
+        if len(name) > 5:
+
+            masked_email = (
+                name[:3]
+                + "*" * (len(name) - 5)
+                + name[-2:]
+                + "@"
+                + domain
+            )
+
+        else:
+
+            masked_email = name[0] + "***@" + domain
+
+        remaining = 0
+
+        available_at = session.get("resend_available_at")
+
+        if available_at:
+
+            available_time = datetime.fromisoformat(available_at)
+
+            remaining = max(
+                0,
+                int((available_time - datetime.now()).total_seconds())
+            )
+
+        return render_template(
+
+            "verify_otp.html",
+
+            masked_email=masked_email,
+
+            remaining=remaining
+
+        )
+
+
+
+    entered_otp = request.form["otp"].strip()
+
+    stored_otp = session.get("reset_otp")
+
+    expiry = session.get("otp_expiry")
+
+    if not stored_otp or not expiry:
+
+        flash(
+            "Please request a new OTP.",
+            "error"
+        )
+
+        return redirect("/forgot_password")
+
+    expiry_time = datetime.fromisoformat(expiry)
+
+    if datetime.now() > expiry_time:
+
+        session.pop("reset_otp", None)
+        session.pop("otp_expiry", None)
+
+        flash(
+            "OTP has expired. Please request a new one.",
+            "error"
+        )
+
+        return redirect("/forgot_password")
+
+    if entered_otp != stored_otp:
+
+        flash(
+            "Incorrect OTP.",
+            "error"
+        )
+
+        return redirect("/verify_otp")
+
+    session.pop("reset_otp", None)
+    session.pop("otp_expiry", None)
+
+    flash(
+        "OTP verified successfully.",
+        "success"
+    )
+
+    return redirect("/reset_password")
+
+@app.route("/reset_password", methods=["GET", "POST"])
+def reset_password():
+
+    if "reset_email" not in session:
+
+        flash(
+            "Please verify OTP first.",
+            "error"
+        )
+
+        return redirect("/forgot_password")
+
+    if request.method == "GET":
+
+        return render_template(
+            "reset_password.html"
+        )
+
+    new_password = request.form["new_password"]
+
+    confirm_password = request.form["confirm_password"]
+
+    if new_password != confirm_password:
+
+        flash(
+            "Passwords do not match.",
+            "error"
+        )
+
+        return redirect("/reset_password")
+
+    if len(new_password) < 8:
+
+        flash(
+            "Password must be at least 8 characters.",
+            "error"
+        )
+
+        return redirect("/reset_password")
+
+    hashed_password = generate_password_hash(
+        new_password
+    )
+
+    conn = connect_db()
+
+    conn.execute(
+
+        """
+
+        UPDATE admin
+
+        SET password = ?
+
+        WHERE email = ?
+
+        """,
+
+        (
+
+            hashed_password,
+
+            session["reset_email"]
+
+        )
+
+    )
+
+    conn.commit()
+
+    conn.close()
+
+    session.pop("reset_email", None)
+
+    flash(
+
+        "Password reset successfully. Please login.",
+
+        "success"
+
+    )
+
+    return redirect("/login")
+
 
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
@@ -292,6 +795,10 @@ def signup():
         username = request.form['username'].strip()
 
         password = request.form['password']
+
+        email = request.form["email"]
+
+        mobile = request.form["mobile"]
 
         confirm_password = request.form['confirm_password']
 
@@ -364,6 +871,25 @@ def signup():
             flash("Username already exists","error")
 
             return redirect('/signup')
+        
+        # email varifications
+
+        existing_email = conn.execute(
+
+            "SELECT * FROM admin WHERE email = ?",
+
+            (email,)
+
+        ).fetchone()
+
+        if existing_email:
+
+            conn.close()
+
+            flash("Email already registered", "error")
+
+            return redirect("/signup")
+
 
 
         # Create admin account
@@ -374,13 +900,24 @@ def signup():
 
             """
 
-            INSERT INTO admin (username, password)
-
-            VALUES (?, ?)
+            INSERT INTO admin(
+                username,
+                email,
+                mobile,
+                password,
+                theme
+            )
+            VALUES (?, ?, ?, ?, ?)
 
             """,
 
-            (username, hashed_password)
+                (
+                    username,
+                    email,
+                    mobile,
+                    hashed_password,
+                    "light"
+                )
 
         )
 
@@ -396,6 +933,126 @@ def signup():
 
     return render_template("signup.html")
 
+@app.route("/resend_otp")
+def resend_otp():
+
+    available_at = session.get("resend_available_at")
+
+    if available_at:
+
+        available_time = datetime.fromisoformat(available_at)
+
+        if datetime.now() < available_time:
+
+            remaining = int(
+                (available_time - datetime.now()).total_seconds()
+            )
+
+            flash(
+                f"Please wait {remaining} seconds before requesting another OTP.",
+                "error"
+            )
+
+            return redirect("/verify_otp")
+
+    session["resend_available_at"] = (
+        datetime.now() + timedelta(seconds=60)
+    ).isoformat()
+
+
+    email = session.get("reset_email")
+
+    if not email:
+
+        flash(
+            "Please start the password reset process again.",
+            "error"
+        )
+
+        return redirect("/forgot_password")
+
+    otp = str(random.randint(100000, 999999))
+
+    session["reset_otp"] = otp
+
+    session["otp_expiry"] = (
+        datetime.now() + timedelta(minutes=5)
+    ).isoformat()
+
+    subject = "Mess Manager Password Reset OTP"
+
+    body = f"""
+Hello,
+
+Your new OTP is:
+
+{otp}
+
+This OTP is valid for 5 minutes.
+
+Regards,
+Mess Manager
+"""
+
+    if send_email(email, subject, body):
+
+        flash(
+            "A new OTP has been sent.",
+            "success"
+        )
+
+    else:
+
+        flash(
+            "Unable to send OTP.",
+            "error"
+        )
+
+    return redirect("/verify_otp")
+
+@app.route('/set_theme', methods=['POST'])
+@login_required
+def set_theme():
+
+    theme = request.form['theme']
+
+    admin_id = session['admin_id']
+
+    conn = connect_db()
+
+    conn.execute(
+
+        """
+        UPDATE admin
+        SET theme = ?
+        WHERE id = ?
+        """,
+
+        (theme, admin_id)
+
+    )
+
+    conn.commit()
+    conn.close()
+
+    session['theme'] = theme
+
+    return redirect('/profile')
+
+@app.route('/profile')
+@login_required
+def profile():
+
+    admin_username = session['admin_username']
+    current_theme = session.get('theme', 'light')
+    return render_template(
+
+        'profile.html',
+
+        admin_username=admin_username,
+        current_theme=current_theme
+
+    )
 
 @app.route('/logout')
 def logout():
@@ -592,6 +1249,73 @@ def home():
         total_fees=total_fees,
         progress_color=progress_color
     )
+
+@app.route('/delete_student/<int:student_id>')
+@login_required
+def delete_student(student_id):
+
+    conn = connect_db()
+
+    admin_id = session['admin_id']
+
+    student = conn.execute(
+
+        """
+
+        SELECT *
+
+        FROM students
+
+        WHERE id = ?
+
+        AND admin_id = ?
+
+        """,
+
+        (student_id, admin_id)
+
+    ).fetchone()
+
+    if not student:
+
+        conn.close()
+
+        flash("Unauthorized delete attempt","error")
+
+        return redirect('/student_list')
+
+    student_name = student['name']
+
+    conn.execute(
+        "DELETE FROM payments WHERE student_id=?",
+        (student_id,)
+    )
+
+    conn.execute(
+
+        "DELETE FROM students WHERE id=? AND admin_id=?",
+
+        (student_id, admin_id)
+
+    )
+
+    conn.commit()
+
+    log_activity(
+
+        admin_id,
+
+        "Delete",
+
+        f"Deleted student {student_name}"
+
+    )
+
+    conn.close()
+
+    flash("Student deleted successfully!","success")
+
+    return redirect('/student_list')
 
 
 @app.route('/import_students', methods=['GET', 'POST'])
@@ -1643,6 +2367,17 @@ def update_student():
     )
 
     conn.commit()
+
+    log_activity(
+
+        admin_id,
+
+        "Edit",
+
+        f"Updated student {name}"
+
+    )
+
     conn.close()
 
     flash("Student updated successfully!","success")

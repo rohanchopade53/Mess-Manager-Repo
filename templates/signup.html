@@ -9,91 +9,109 @@ Dashboard
 <div class="login-wrapper">
     <div class="login-page">
 
-        
 
-            <div class="login-left">
 
-                <div class="brand-content">
+        <div class="login-left">
 
-                    <div class="brand-icon">
-                        📋
+            <div class="brand-content">
+
+                <div class="brand-icon">
+                    📋
+                </div>
+
+                <h1 class="brand-title">
+                    Join Mess Manager
+                </h1>
+
+                <p class="brand-tagline">
+                    Create an administrator account and start managing your hostel effortlessly.
+                </p>
+
+                <div class="feature-list">
+
+                    <div class="feature-item">
+                        ✓ Secure Admin Access
                     </div>
 
-                    <h1 class="brand-title">
-                        Join Mess Manager
-                    </h1>
+                    <div class="feature-item">
+                        ✓ Student Registration
+                    </div>
 
-                    <p class="brand-tagline">
-                        Create an administrator account and start managing your hostel effortlessly.
-                    </p>
+                    <div class="feature-item">
+                        ✓ Fee Collection Tracking
+                    </div>
 
-                    <div class="feature-list">
-
-                        <div class="feature-item">
-                            ✓ Secure Admin Access
-                        </div>
-
-                        <div class="feature-item">
-                            ✓ Student Registration
-                        </div>
-
-                        <div class="feature-item">
-                            ✓ Fee Collection Tracking
-                        </div>
-
-                        <div class="feature-item">
-                            ✓ Professional PDF Reports
-                        </div>
-
+                    <div class="feature-item">
+                        ✓ Professional PDF Reports
                     </div>
 
                 </div>
 
             </div>
 
-
-            <div class="login-right">
-
-                <div class="login-card">
-
-                    <h1>Create Account</h1>
-
-                    <p>Register new admin account</p>
+        </div>
 
 
+        <div class="login-right">
+
+            <div class="login-card">
+
+                <h1>Create Account</h1>
+
+                <p>Register new admin account</p>
 
 
-                    <form method="POST">
-
-                        <input type="text" name="username" placeholder="Username" required>
 
 
-                        <input type="password" name="password" placeholder="Password" required>
+                <form method="POST">
+
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mobile Number</label>
+                        <input type="text" name="mobile" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" name="confirm_password" class="form-input" required>
+                    </div>
 
 
-                        <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+                    <div class="form-group">
+                    <button type="submit" class="primary-btn">
+                        Create Account
+                    </button>
+                    </div>
 
 
-                        <button type="submit">
-
-                            Create Account
-
-                        </button>
-
-                    </form>
+                </form>
 
 
-                    <p style="margin-top:20px; text-align:center;">
+                <p style="margin-top:20px; text-align:center;">
 
-                        Already have an account?
+                    Already have an account?
 
-                        <a href="/login">Login</a>
+                    <a href="/login">Login</a>
 
-                    </p>
+                </p>
 
-                </div>
             </div>
-        
+        </div>
+
 
     </div>
 </div>

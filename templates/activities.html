@@ -20,53 +20,73 @@ Activities
 
         {% if activities %}
 
-            {% for activity in activities %}
+        {% for activity in activities %}
 
-                <div class="activity-item">
+        <div class="activity-item">
 
-                    <div class="activity-header">
+            <div class="activity-header">
 
-                        {% if activity['activity_type'] == 'Payment' %}
+                {% if activity['activity_type'] == 'Payment' %}
 
-                            💰 Payment Received
+                <span class="activity-payment">
+                    💰 Payment Received
+                </span>
 
-                        {% elif activity['activity_type'] == 'Student' %}
+                {% elif activity['activity_type'] == 'Student' %}
 
-                            👤 Student Added
+                <span class="activity-student">
+                    👤 Student Added
+                </span>
 
-                        {% elif activity['activity_type'] == 'Import' %}
+                {% elif activity['activity_type'] == 'Edit' %}
 
-                            📥 CSV Import
+                <span class="activity-edit">
+                    ✏️ Student Updated
+                </span>
 
-                        {% else %}
+                {% elif activity['activity_type'] == 'Delete' %}
 
-                            📌 Activity
+                <span class="activity-delete">
+                    🗑 Student Deleted
+                </span>
 
-                        {% endif %}
+                {% elif activity['activity_type'] == 'Import' %}
 
-                    </div>
+                <span class="activity-import">
+                    📥 CSV Import
+                </span>
 
-                    <div class="activity-description">
+                {% elif activity['activity_type'] == 'Security' %}
 
-                        {{ activity['description'] }}
+                <span class="activity-security">
+                    🔐 Password Changed
+                </span>
 
-                    </div>
+                {% endif %}
 
-                    <div class="activity-date">
+            </div>
 
-                        {{ activity['created_at'] }}
+            <div class="activity-description">
 
-                    </div>
+                {{ activity['description'] }}
 
-                </div>
+            </div>
 
-            {% endfor %}
+            <div class="activity-date">
+
+                {{ activity['created_at'] }}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
 
         {% else %}
 
-            <p>
-                No activities found
-            </p>
+        <p>
+            No activities found
+        </p>
 
         {% endif %}
 

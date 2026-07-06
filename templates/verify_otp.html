@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}
+Verify OTP
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <div class="payment-card ui-card">
+
+        <div class="page-heading">
+
+            <h1 class="page-title">
+                Verify OTP
+            </h1>
+
+            <p class="form-subtitle">
+                Enter the 6-digit OTP sent to your registered email.
+            </p>
+
+        </div>
+
+        <form action="/verify_otp" method="POST">
+<div class="otp-info">
+
+    <div class="otp-icon">
+        🔒
+    </div>
+
+    <h2 class="otp-title">
+        Verify Your Email
+    </h2>
+
+    <p class="otp-subtitle">
+        We've sent a 6-digit verification code to
+    </p>
+
+    <p class="otp-email">
+        {{ masked_email }}
+    </p>
+
+</div>
+
+<div class="otp-inputs">
+
+    <input type="text" maxlength="1" class="otp-box">
+    <input type="text" maxlength="1" class="otp-box">
+    <input type="text" maxlength="1" class="otp-box">
+    <input type="text" maxlength="1" class="otp-box">
+    <input type="text" maxlength="1" class="otp-box">
+    <input type="text" maxlength="1" class="otp-box">
+
+</div>
+
+<input
+    type="hidden"
+    name="otp"
+    id="otp-value">
+
+<button
+    type="submit"
+    class="primary-btn otp-submit">
+
+    Verify OTP
+
+</button>
+
+<div class="otp-footer">
+<span id="countdown">
+    Resend code in {{ remaining }}s
+</span>
+
+<a
+    href="/resend_otp"
+    id="resend-link"
+    {% if remaining > 0 %}style="display:none;"{% endif %}
+>
+    Resend OTP
+</a>
+
+<a
+    href="/resend_otp"
+    id="resend-link"
+    style="display:none;">
+
+    Resend OTP
+
+</a>
+
+    <a
+        href="/forgot_password"
+        class="back-link">
+
+        Use another email
+
+    </a>
+
+</div>
+  
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const otpBoxes = document.querySelectorAll(".otp-box");
+const hiddenInput = document.getElementById("otp-value");
+
+function updateOTP(){
+
+    let otp = "";
+
+    otpBoxes.forEach(box => {
+
+        otp += box.value;
+
+    });
+
+    hiddenInput.value = otp;
+
+}
+
+otpBoxes.forEach((box,index)=>{
+
+    box.addEventListener("input",function(){
+
+        this.value = this.value.replace(/[^0-9]/g,"");
+
+        if(this.value && index < otpBoxes.length-1){
+
+            otpBoxes[index+1].focus();
+
+        }
+
+        updateOTP();
+
+    });
+
+    box.addEventListener("keydown",function(e){
+
+        if(e.key==="Backspace" && !this.value && index>0){
+
+            otpBoxes[index-1].focus();
+
+        }
+
+    });
+
+});
+
+otpBoxes[0].addEventListener("paste",function(e){
+
+    e.preventDefault();
+
+    const data = e.clipboardData.getData("text").trim();
+
+    if(!/^\d{6}$/.test(data)) return;
+
+    data.split("").forEach((digit,index)=>{
+
+        otpBoxes[index].value = digit;
+
+    });
+
+    updateOTP();
+
+    otpBoxes[5].focus();
+
+});
+
+
+
+let seconds = {{ remaining }};
+
+const countdown = document.getElementById("countdown");
+const resendLink = document.getElementById("resend-link");
+
+if (seconds <= 0) {
+
+    countdown.style.display = "none";
+
+    resendLink.style.display = "inline-block";
+
+} else {
+
+    const timer = setInterval(() => {
+
+        seconds--;
+
+        countdown.textContent = `Resend code in ${seconds}s`;
+
+        if (seconds <= 0) {
+
+            clearInterval(timer);
+
+            countdown.style.display = "none";
+
+            resendLink.style.display = "inline-block";
+
+        }
+
+    }, 1000);
+
+}
+
+</script>
+
+{% endblock %}

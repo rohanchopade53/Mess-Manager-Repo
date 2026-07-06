@@ -108,24 +108,43 @@ Dashboard
                 <div class="payment-item">
 
                     <div class="payment-left">
-
-                        <div class="student-payment-name">
+                        <div class="activity-header">
 
                             {% if activity['activity_type'] == 'Payment' %}
 
-                            💰 Payment Received
+                            <span class="activity-payment">
+                                💰 Payment Received
+                            </span>
 
                             {% elif activity['activity_type'] == 'Student' %}
 
-                            👤 Student Added
+                            <span class="activity-student">
+                                👤 Student Added
+                            </span>
+
+                            {% elif activity['activity_type'] == 'Edit' %}
+
+                            <span class="activity-edit">
+                                ✏️ Student Updated
+                            </span>
+
+                            {% elif activity['activity_type'] == 'Delete' %}
+
+                            <span class="activity-delete">
+                                🗑 Student Deleted
+                            </span>
 
                             {% elif activity['activity_type'] == 'Import' %}
 
-                            📥 CSV Import
+                            <span class="activity-import">
+                                📥 CSV Import
+                            </span>
 
-                            {% else %}
+                            {% elif activity['activity_type'] == 'Security' %}
 
-                            📌 Activity
+                            <span class="activity-security">
+                                🔐 Password Changed
+                            </span>
 
                             {% endif %}
 
