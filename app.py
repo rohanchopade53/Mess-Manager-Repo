@@ -24,6 +24,9 @@ from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 import os
+from whatsapp_sender import send_bulk_messages
+
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -316,6 +319,107 @@ def find_admin(identifier):
     conn.close()
 
     return admin
+
+def get_pending_students(admin_id, payment_filter):
+
+    conn = connect_db()
+
+    if payment_filter == "1_5000":
+
+        students = conn.execute(
+
+            """
+
+            SELECT *
+
+            FROM students
+
+            WHERE admin_id = ?
+
+            AND (total_fees - received_amount) > 0
+
+            AND (total_fees - received_amount) <= 5000
+
+            ORDER BY (total_fees - received_amount) ASC
+
+            """,
+
+            (admin_id,)
+
+        ).fetchall()
+
+    elif payment_filter == "1_15000":
+
+        students = conn.execute(
+
+            """
+
+            SELECT *
+
+            FROM students
+
+            WHERE admin_id = ?
+
+            AND (total_fees - received_amount) > 0
+
+            AND (total_fees - received_amount) <= 15000
+
+            ORDER BY (total_fees - received_amount) DESC
+
+            """,
+
+            (admin_id,)
+
+        ).fetchall()
+
+    elif payment_filter == "15000":
+
+        students = conn.execute(
+
+            """
+
+            SELECT *
+
+            FROM students
+
+            WHERE admin_id = ?
+
+            AND (total_fees - received_amount) > 15000
+
+            ORDER BY (total_fees - received_amount) DESC
+
+            """,
+
+            (admin_id,)
+
+        ).fetchall()
+
+    else:
+
+        students = conn.execute(
+
+            """
+
+            SELECT *
+
+            FROM students
+
+            WHERE admin_id = ?
+
+            AND (total_fees - received_amount) > 0
+
+            ORDER BY (total_fees - received_amount) DESC
+
+            """,
+
+            (admin_id,)
+
+        ).fetchall()
+
+    conn.close()
+
+    return students
+
 
 def send_email(receiver_email, subject, body):
 
@@ -1196,7 +1300,7 @@ def home():
     ).fetchall()
 
 
-    print("ACTIVITIES:", len(recent_activities))
+  
 
     for activity in recent_activities:
         print(dict(activity))
@@ -1371,7 +1475,7 @@ def import_students():
 
     if request.method == 'POST':
 
-        print("POST RECEIVED")
+       
 
         csv_file = request.files['csv_file']
 
@@ -1689,7 +1793,7 @@ def student_list():
     search = request.args.get('search')
 
     hostel = request.args.get('hostel')
-    print(hostel)
+
     conn = connect_db()
 
     
@@ -2516,111 +2620,64 @@ def receive_payment_page(student_id):
 @app.route("/pending_payments")
 @login_required
 def pending_payments():
- 
 
-    conn = connect_db()
-    admin_id = session['admin_id']
-    payment_filter = request.args.get('payment_filter')
+    admin_id = session["admin_id"]
 
-    if payment_filter == "1_5000":
+    payment_filter = request.args.get("payment_filter")
 
-        students = conn.execute(
-
-            """
-
-            SELECT *
-
-            FROM students
-
-            WHERE admin_id = ?
-
-            AND (total_fees - received_amount) > 0
-            AND (total_fees - received_amount) <= 5000
-
-            ORDER BY (total_fees - received_amount) ASC
-
-            """,
-
-            (admin_id,)
-
-        ).fetchall()
-
-
-    elif payment_filter == "1_15000":
-
-        students = conn.execute(
-
-            """
-
-            SELECT *
-
-            FROM students
-
-            WHERE admin_id = ?
-
-            
-            AND (total_fees - received_amount) > 0
-            AND (total_fees - received_amount) <= 15000
-
-            ORDER BY (total_fees - received_amount) DESC
-
-            """,
-
-            (admin_id,)
-
-        ).fetchall()
-
-
-    elif payment_filter == "15000":
-
-        students = conn.execute(
-
-            """
-
-            SELECT *
-
-            FROM students
-
-            WHERE admin_id = ?
-
-            AND (total_fees - received_amount) > 15000
-
-            ORDER BY (total_fees - received_amount) DESC
-
-            """,
-
-            (admin_id,)
-
-        ).fetchall()
-
-
-    else:
-
-        students = conn.execute(
-
-            """
-
-            SELECT *
-
-            FROM students
-
-            WHERE admin_id = ?
-
-            AND (total_fees - received_amount) > 0
-
-            ORDER BY (total_fees - received_amount) DESC
-
-            """,
-
-            (admin_id,)
-
-        ).fetchall()
-    conn.close()
+    students = get_pending_students(
+        admin_id,
+        payment_filter
+    )
 
     return render_template(
         "pending_payments.html",
         students=students
     )
+
+
+@app.route("/send_whatsapp_reminders", methods=["POST"])
+@login_required
+def send_whatsapp_reminders():
+
+    admin_id = session["admin_id"]
+
+    payment_filter = request.form.get("payment_filter")
+
+    students = get_pending_students(
+        admin_id,
+        payment_filter
+    )
+
+    success, failed = send_bulk_messages(students)
+  
+    log_activity(
+
+        admin_id,
+
+        "Reminder",
+
+        f"Sent WhatsApp reminders (Success: {success}, Failed: {failed})"
+
+    )
+
+
+
+    if failed == 0:
+
+        flash(
+            f"Successfully sent WhatsApp reminders to {success} students.",
+            "success"
+        )
+
+    else:
+
+        flash(
+            f"Reminder process completed. Success: {success}, Failed: {failed}.",
+            "warning"
+        )
+
+    return redirect("/pending_payments")
 
 
 @app.route('/download_pending_pdf')

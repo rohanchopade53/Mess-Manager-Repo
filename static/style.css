@@ -3490,6 +3490,82 @@ tr:nth-child(even) {
 }
 
 
+.modal{
+
+    display:none;
+    position:fixed;
+    inset:0;
+
+    background:rgba(55, 73, 170, 0.65);
+
+    backdrop-filter:blur(5px);
+
+    justify-content:center;
+    align-items:center;
+
+    z-index:9999;
+
+}
+
+.modal-content{
+
+    width:460px;
+    max-width:90%;
+
+    background:var(--card-bg);
+
+    color:var(--text-color);
+
+    border-radius:18px;
+
+    padding:35px;
+
+    box-shadow:0 15px 50px rgba(0,0,0,.35);
+
+    text-align:center;
+
+}
+
+.modal-content h2{
+
+    margin-bottom:15px;
+
+}
+
+.modal-content p{
+
+    color:var(--text-secondary);
+
+    line-height:1.6;
+
+    margin-bottom:30px;
+
+}
+
+.modal-actions{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+}
+.modal-actions form{
+
+    margin:0;
+
+}
+
+.modal-actions .primary-btn,
+.modal-actions .secondary-btn{
+
+    min-width:150px;
+
+}
+
+
+ /* 
 @media (max-width: 900px) {
 
     .login-page {
@@ -3502,7 +3578,9 @@ tr:nth-child(even) {
         display: none;
     }
 }
+ */
 
+ 
 .login-card h1 {
 
     margin: 0;
@@ -3900,292 +3978,4 @@ tr:nth-child(even) {
 
 }
 
-/* 
-@media (max-width: 768px) {
 
-    .recent-payments,
-    .quick-actions {
-
-        width: 100% !important;
-    }
-
-
-    .dashboard-cards {
-
-        margin-bottom: 4px !important;
-    }
-
-    .dashboard-container {
-
-        gap: 12px !important;
-    }
-
-    .dashboard-layout {
-
-        gap: 12px !important;
-    }
-
-    .recent-payments,
-    .quick-actions {
-
-        padding: 14px !important;
-    }
-
-
-
-    .dashboard-middle {
-
-        display: flex !important;
-
-        flex-direction: column !important;
-
-        gap: 16px !important;
-
-        width: 100%;
-    }
-
-    .page-content {
-
-        width: 100%;
-
-        padding: 10px !important;
-    }
-
-    .container,
-    .dashboard-container {
-
-        width: 100%;
-
-        max-width: 100%;
-    }
-
-    .page-content {
-
-        padding: 0 14px 30px;
-    }
-
-    .container {
-
-        gap: 18px;
-    }
-
-    .topbar {
-
-        flex-direction: column;
-
-        align-items: stretch;
-
-        gap: 14px;
-
-        padding: 18px;
-    }
-
-    .nav-links {
-
-        width: 100%;
-
-        justify-content: center;
-
-        flex-wrap: wrap;
-
-        gap: 10px;
-    }
-
-    .nav-links a {
-
-        flex: 1;
-
-        text-align: center;
-
-        min-width: 120px;
-    }
-
-    .dashboard-middle,
-    .profile-top,
-    .profile-main,
-    .profile-summary,
-    .profile-details,
-    .profile-buttons,
-    .search-form,
-    .filter-form,
-    .form-actions {
-
-        display: flex !important;
-
-        flex-direction: column !important;
-
-        width: 100%;
-    }
-
-    .dashboard-cards {
-
-        display: grid;
-
-        grid-template-columns: 1fr 1fr;
-
-        gap: 12px;
-    }
-
-    .dashboard-card {
-
-        min-height: 90px;
-
-        padding: 16px;
-    }
-
-    .student-form-card,
-    .payment-card,
-    .search-panel,
-    .table-panel,
-    .recent-payments,
-    .quick-actions {
-
-        padding: 18px;
-    }
-
-    .profile-avatar {
-
-        width: 72px;
-
-        height: 72px;
-
-        font-size: 28px;
-    }
-
-    .profile-name {
-
-        font-size: 28px;
-    }
-
-    .summary-card p {
-
-        font-size: 28px;
-    }
-
-    .students-table {
-
-        min-width: 650px;
-    }
-
-    .table-container {
-
-        overflow-x: auto;
-    }
-
-    .dashboard-card,
-    
-    .profile-top,
-    .payment-card,
-    .student-form-card,
-    .recent-payments,
-    .quick-actions {
-
-        min-height: unset !important;
-
-        height: auto !important;
-    }
-
-    .page-content {
-
-        margin: 18px auto !important;
-    }
-
-    .ui-card,
-    .payment-card,
-    .student-form-card,
-    .table-panel {
-
-        padding: 16px !important;
-    }
-
-    .dashboard-middle {
-
-    display: flex !important;
-
-    flex-direction: column !important;
-}
-
-.recent-payments,
-.quick-actions {
-
-    width: 100% !important;
-
-    max-width: 100% !important;
-
-    flex: unset !important;
-}
-.dashboard-middle {
-
-    display: block !important;
-}
-
-.recent-payments {
-
-    display: block !important;
-
-    width: 100% !important;
-
-    margin-bottom: 16px !important;
-}
-
-.quick-actions {
-
-    display: block !important;
-
-    width: 100% !important;
-
-    margin-top: 0 !important;
-}
-
-.pending-header {
-
-    display: flex !important;
-
-    flex-direction: column !important;
-
-    align-items: stretch !important;
-
-    gap: 14px !important;
-}
-.filter-form {
-
-    display: flex !important;
-
-    flex-direction: column !important;
-
-    gap: 12px !important;
-
-    width: 100%;
-}
-
-.filter-form select,
-.filter-form button,
-.download-btn {
-
-    width: 100% !important;
-}
-.pending-header {
-
-    margin-bottom: 20px !important;
-}
-
-.table-container {
-
-    margin-top: 18px !important;
-}
-
-.page-content {
-
-    width: 100% !important;
-
-    padding: 14px !important;
-}
-
-.students-table {
-
-    min-width: 600px;
-}
-
-
-
-} */
