@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# Chrome Profile
+chrome_profile/
+
+# Generated PDFs
+*.pdf
+
+# SQLite journals
+*.db-journal
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
